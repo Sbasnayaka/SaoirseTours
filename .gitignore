@@ -1,0 +1,12 @@
+# Ignore config with secrets
+includes/config.php
+
+# Ignore uploads
+uploads/
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore vendor (if added later)
+vendor/
