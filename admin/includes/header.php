@@ -211,9 +211,12 @@
                 <li><a href="dashboard.php"
                         class="<?php echo basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'active' : ''; ?>"><i
                             class="bi bi-speedometer2"></i> Dashboard</a></li>
+                <li><a href="theme_customizer.php"
+                        class="<?php echo basename($_SERVER['PHP_SELF']) == 'theme_customizer.php' ? 'active' : ''; ?>"><i
+                            class="bi bi-palette-fill"></i> Global Theme</a></li>
                 <li><a href="settings.php"
                         class="<?php echo basename($_SERVER['PHP_SELF']) == 'settings.php' ? 'active' : ''; ?>"><i
-                            class="bi bi-sliders"></i> Global Settings</a></li>
+                            class="bi bi-sliders"></i> Site Identity</a></li>
                 <li><a href="pages.php"
                         class="<?php echo in_array(basename($_SERVER['PHP_SELF']), ['pages.php', 'edit_page.php', 'page_sections.php', 'edit_section.php']) ? 'active' : ''; ?>"><i
                             class="bi bi-file-earmark-text"></i> Pages & Sections</a></li>
