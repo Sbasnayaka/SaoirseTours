@@ -85,8 +85,17 @@ include 'includes/header.php';
         <div class="row">
             <!-- Left Column: Content -->
             <div class="col-md-8">
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle-fill"></i> <strong>Note:</strong> This is the <strong>Legacy
+                        Editor</strong>.
+                    If you want to build a modern section with multiple elements (Headings, Images, Grid), allow this to
+                    remain empty or basic, and use the
+                    <a href="builder.php?section_id=<?php echo $sec['id']; ?>" class="fw-bold text-dark">Visual Page
+                        Builder</a> instead.
+                </div>
+
                 <div class="card mb-4">
-                    <div class="card-header">Main Content</div>
+                    <div class="card-header">Legacy Content</div>
                     <div class="card-body">
                         <div class="mb-3">
                             <label class="form-label">Section Title (Heading)</label>
@@ -99,15 +108,16 @@ include 'includes/header.php';
                                 value="<?php echo htmlspecialchars($sec['subtitle']); ?>">
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Body Content</label>
+                            <label class="form-label">Body Content (Simple Text Only)</label>
                             <textarea class="form-control" name="content" id="editor"
                                 rows="10"><?php echo htmlspecialchars($sec['content']); ?></textarea>
+                            <div class="form-text">For advanced layouts, leave this blank and use the Builder.</div>
                         </div>
                     </div>
                 </div>
 
                 <div class="card mb-4">
-                    <div class="card-header">Media & Image</div>
+                    <div class="card-header">Media & Image (Legacy)</div>
                     <div class="card-body">
                         <div class="mb-3">
                             <label class="form-label">Section Image</label>

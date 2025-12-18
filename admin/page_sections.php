@@ -49,7 +49,6 @@ include 'includes/header.php';
                     <div class="card-header d-flex justify-content-between align-items-center bg-white">
                         <div class="d-flex align-items-center gap-3">
                             <span class="badge bg-secondary"><?php echo $sec['display_order']; ?></span>
-<<<<<<< HEAD
                             <h5 class="mb-0"><?php echo htmlspecialchars($sec['title'] ?: 'Section ' . $sec['id']); ?></h5>
                         </div>
                         <div>
@@ -59,15 +58,6 @@ include 'includes/header.php';
                                 class="btn btn-sm btn-info text-white"><i class="bi bi-gear"></i> Props</a>
                             <a href="delete_section.php?id=<?php echo $sec['id']; ?>&page_id=<?php echo $page_id; ?>"
                                 class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
-=======
-                            <h5 class="mb-0"><?php echo htmlspecialchars($sec['title'] ?: 'Untitled Section'); ?></h5>
-                        </div>
-                        <div>
-                            <a href="edit_section.php?id=<?php echo $sec['id']; ?>&page_id=<?php echo $page_id; ?>"
-                                class="btn btn-sm btn-info text-white"><i class="bi bi-pencil"></i> Edit</a>
-                            <a href="delete_section.php?id=<?php echo $sec['id']; ?>&page_id=<?php echo $page_id; ?>"
-                                class="btn btn-sm btn-danger"><i class="bi bi-trash"></i> Delete</a>
->>>>>>> 357990270b919a3de9bcb361223ce41a6316e17e
                         </div>
                     </div>
                     <div class="card-body"

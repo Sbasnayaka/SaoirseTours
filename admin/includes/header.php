@@ -195,7 +195,8 @@
         }
     </style>
     <!-- CKEditor -->
-    <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+    <!-- CKEditor -->
+    <script src="https://cdn.ckeditor.com/4.24.0-lts/standard/ckeditor.js"></script>
 </head>
 
 <body>
