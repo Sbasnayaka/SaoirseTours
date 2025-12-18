@@ -38,10 +38,12 @@ include 'includes/header.php';
                                 <td><?php echo htmlspecialchars($page['slug']); ?></td>
                                 <td><?php echo date('M d, Y', strtotime($page['created_at'])); ?></td>
                                 <td>
+                                    <a href="page_sections.php?page_id=<?php echo $page['id']; ?>"
+                                        class="btn btn-warning btn-sm"><i class="bi bi-layers"></i> Manage Sections</a>
                                     <a href="edit_page.php?id=<?php echo $page['id']; ?>"
-                                        class="btn btn-info btn-sm">Edit</a>
+                                        class="btn btn-info btn-sm">SEO/Title</a>
                                     <a href="delete_page.php?id=<?php echo $page['id']; ?>" class="btn btn-danger btn-sm"
-                                        onclick="return confirm('Are you sure you want to delete this page?');">Delete</a>
+                                        onclick="return confirm('Delete this page?');">Delete</a>
                                     <a href="../<?php echo $page['slug']; ?>" target="_blank"
                                         class="btn btn-secondary btn-sm">View</a>
                                 </td>

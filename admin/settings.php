@@ -20,6 +20,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $logoPath = null;
     if (!empty($_FILES['logo']['name'])) {
         $targetDir = "../uploads/";
+        if (!is_dir($targetDir)) {
+            mkdir($targetDir, 0755, true);
+        }
         $fileName = time() . '_' . basename($_FILES['logo']['name']);
         $targetFile = $targetDir . $fileName;
         $imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
