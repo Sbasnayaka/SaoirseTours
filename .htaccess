@@ -1,4 +1,5 @@
 RewriteEngine On
+RewriteBase /SaoirseTours/
 
 # Setup error pages (optional)
 # ErrorDocument 404 /404.php

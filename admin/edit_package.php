@@ -26,6 +26,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $imagePath = $pkg['image'];
     if (!empty($_FILES['image']['name'])) {
         $targetDir = "../uploads/";
+        if (!is_dir($targetDir))
+            mkdir($targetDir, 0755, true);
         $fileName = time() . '_' . basename($_FILES['image']['name']);
         if (move_uploaded_file($_FILES['image']['tmp_name'], $targetDir . $fileName)) {
             $imagePath = $fileName;
