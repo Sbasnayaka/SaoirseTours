@@ -8,10 +8,10 @@
             <div class="col-md-4 mb-3">
                 <h5>Quick Links</h5>
                 <ul class="list-unstyled">
-                    <li><a href="home" class="text-white-50 text-decoration-none">Home</a></li>
-                    <li><a href="packages" class="text-white-50 text-decoration-none">Packages</a></li>
-                    <li><a href="contact" class="text-white-50 text-decoration-none">Contact Us</a></li>
-                    <li><a href="admin/login.php" class="text-white-50 text-decoration-none" target="_blank">Admin
+                    <li><a href="home" class="text-white text-decoration-none">Home</a></li>
+                    <li><a href="packages" class="text-white text-decoration-none">Packages</a></li>
+                    <li><a href="contact" class="text-white text-decoration-none">Contact Us</a></li>
+                    <li><a href="admin/login.php" class="text-white text-decoration-none" target="_blank">Admin
                             Login</a></li>
                 </ul>
             </div>
