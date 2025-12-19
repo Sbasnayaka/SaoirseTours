@@ -1,6 +1,22 @@
 <?php
+// 1. Fetch Gallery Items
 $gallery = $pdo->query("SELECT * FROM gallery ORDER BY display_order ASC, id DESC")->fetchAll();
 ?>
+
+<?php
+// 2. Render Custom Sections (Intro)
+require_once __DIR__ . '/../classes/PageBuilder.php';
+if (isset($page['id'])) {
+    $secStmt = $pdo->prepare("SELECT * FROM sections WHERE page_id = ? ORDER BY display_order ASC");
+    $secStmt->execute([$page['id']]);
+    $sections = $secStmt->fetchAll();
+    foreach ($sections as $sec) {
+        PageBuilder::renderSection($sec, $pdo);
+    }
+}
+?>
+
+<!-- 3. Masonry Grid -->
 
 <div class="container py-5">
     <h1 class="text-center section-title mb-5">Photo Gallery</h1>
