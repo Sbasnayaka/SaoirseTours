@@ -1,6 +1,22 @@
 <?php
+// Fetch Services for valid Grid Display
 $services = $pdo->query("SELECT * FROM services ORDER BY id ASC")->fetchAll();
 ?>
+
+<?php
+// 1. Render Custom Sections (Hero, Title, Description)
+require_once __DIR__ . '/../classes/PageBuilder.php';
+if (isset($page['id'])) {
+    $secStmt = $pdo->prepare("SELECT * FROM sections WHERE page_id = ? ORDER BY display_order ASC");
+    $secStmt->execute([$page['id']]);
+    $sections = $secStmt->fetchAll();
+    foreach ($sections as $sec) {
+        PageBuilder::renderSection($sec, $pdo);
+    }
+}
+?>
+
+<!-- 2. Auto-Generated Grid from Database -->
 
 <div class="container py-5">
     <h1 class="text-center section-title mb-5">Our Services</h1>
