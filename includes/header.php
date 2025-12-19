@@ -2,6 +2,15 @@
 // Fetch Settings
 $stmt = $pdo->query("SELECT * FROM settings WHERE id = 1");
 $settings = $stmt->fetch();
+if (!$settings) {
+    $settings = [
+        'site_title' => 'Saoirse Tours',
+        'tagline' => 'Experience Sri Lanka',
+        'contact_email' => 'admin@example.com',
+        'logo' => '',
+        'favicon' => ''
+    ];
+}
 
 // Default Meta defaults
 $meta_title = $page['meta_title'] ?? $settings['site_title'];

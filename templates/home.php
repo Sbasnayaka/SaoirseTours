@@ -3,38 +3,26 @@
 $featuredPackages = $pdo->query("SELECT * FROM packages ORDER BY id DESC LIMIT 3")->fetchAll();
 $services = $pdo->query("SELECT * FROM services LIMIT 4")->fetchAll();
 $testimonials = $pdo->query("SELECT * FROM testimonials ORDER BY created_at DESC LIMIT 3")->fetchAll();
-
-// Hero Image (Use a default or one from gallery?)
-// For now, simple background color or placeholder if no image setting in DB for hero.
-// We can use the first gallery image as hero if available.
-$heroImgStmt = $pdo->query("SELECT image FROM gallery ORDER BY display_order ASC LIMIT 1");
-$heroImg = $heroImgStmt->fetchColumn();
-$bgStyle = $heroImg ? "background-image: url('uploads/{$heroImg}');" : "background-color: var(--primary-color);";
 ?>
 
-<!-- Hero Section -->
-<header class="hero-section text-center text-white"
-    style="<?php echo $bgStyle; ?> box-shadow: inset 0 0 0 2000px rgba(0,0,0,0.4);">
-    <div class="container">
-        <h1 class="display-3 fw-bold"><?php echo htmlspecialchars($settings['site_title']); ?></h1>
-        <p class="lead mb-4"><?php echo htmlspecialchars($settings['tagline']); ?></p>
-        <a href="packages" class="btn btn-primary btn-lg">Explore Packages</a>
-    </div>
-</header>
+<!-- Dynamic Content from Page Builder -->
+<?php
+require_once __DIR__ . '/../classes/PageBuilder.php';
 
-<!-- Intro Section (Page Content) -->
-<section class="py-5">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-8 text-center">
-                <h2 class="section-title"><?php echo htmlspecialchars($page['title']); ?></h2>
-                <div class="lead">
-                    <?php echo $page['content']; ?>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
+// Fetch Sections for Home Page (ID=1)
+// Note: We use $page['id'] directly as it's fetched in index.php
+if (isset($page['id'])) {
+    $secStmt = $pdo->prepare("SELECT * FROM sections WHERE page_id = ? ORDER BY display_order ASC");
+    $secStmt->execute([$page['id']]);
+    $sections = $secStmt->fetchAll();
+
+    foreach ($sections as $sec) {
+        PageBuilder::renderSection($sec, $pdo);
+    }
+}
+?>
+
+<!-- Auto-Generated Package Listings (Optional Bonus Content) -->
 
 <!-- Featured Packages -->
 <section class="py-5 bg-light">
