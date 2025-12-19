@@ -85,19 +85,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'background' => array_merge($_POST['background'], ['image' => $bgImg]), // type, color, blur, overlay
             'spacing' => $_POST['spacing'], // padding, margin
             'border' => $_POST['border'], // style, radius
-            'typography' => $_POST['typography'], // color
+            'typography' => $_POST['typography'] ?? [], // color
             'dividers' => $_POST['dividers'] ?? []
         ];
 
-        // Also update legacy columns to stay in sync where possible
-        $sql = "UPDATE sections SET bg_color=?, bg_type=?, bg_gradient=?, opacity=?, bg_transparent=?, section_settings=? WHERE id=?";
+        // Update with robust error handling for legacy columns
+        // We only primarily update section_settings now.
+        // Legacy columns are kept for minor backward compatibility but not critical if missing.
+        $sql = "UPDATE sections SET section_settings=?, bg_color=?, bg_type=? WHERE id=?";
         $pdo->prepare($sql)->execute([
+            json_encode($newAdv),
             $newAdv['background']['color'],
             $newAdv['background']['type'],
-            $newAdv['background']['gradient'] ?? '',
-            $_POST['opacity'] ?? 1,
-            isset($_POST['bg_transparent']) ? 1 : 0,
-            json_encode($newAdv),
             $section_id
         ]);
 
@@ -160,7 +159,8 @@ include 'includes/header.php';
                                 </form>
                             </div>
                         </div>
-                        <div class="card-body p-3 small text-muted"><?php echo strip_tags(substr($el['content'], 0, 100)); ?>
+                        <div class="card-body p-3 small text-muted">
+                            <?php echo strip_tags(substr($el['content'], 0, 100)); ?>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -208,6 +208,8 @@ include 'includes/header.php';
                             type="button">Spacing</button>
                         <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#tab-border"
                             type="button">Borders & Dividers</button>
+                        <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#tab-typography"
+                            type="button">Typography</button>
                     </div>
                     <div class="tab-content w-100 p-3">
 
@@ -381,12 +383,30 @@ include 'includes/header.php';
                             </div>
                         </div>
                     </div>
+
+                    <!-- TYPOGRAPHY -->
+                    <div class="tab-pane fade" id="tab-typography">
+                        <h6>Section Typography</h6>
+                        <div class="mb-3">
+                            <label>Text Color</label>
+                            <input type="color" class="form-control form-control-color w-100" name="typography[color]"
+                                value="<?php echo $adv['typography']['color'] ?? ''; ?>">
+                            <div class="form-text">Leave empty/black to inherit global theme.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label>Text Align</label>
+                            <select class="form-select" name="typography[align]">
+                                <option value="left" <?php echo ($adv['typography']['align'] ?? '') == 'left' ? 'selected' : ''; ?>>Left</option>
+                                <option value="center" <?php echo ($adv['typography']['align'] ?? '') == 'center' ? 'selected' : ''; ?>>Center</option>
+                                <option value="right" <?php echo ($adv['typography']['align'] ?? '') == 'right' ? 'selected' : ''; ?>>Right</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="modal-footer bg-light">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="submit" class="btn btn-primary">Save Advanced Settings</button>
-            </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Advanced Settings</button>
+                </div>
         </form>
     </div>
 </div>
@@ -394,9 +414,9 @@ include 'includes/header.php';
 <script>
     if (typeof CKEDITOR != 'undefined') CKEDITOR.replace('.ckeditor-lite');
     function toggleBgType(val) {
-        document.querySelectorAll('.bg-section-field').forEach(el => el.classList.add('d-none'));
-        if (val === 'color') document.getElementById('bg-color-field').classList.remove('d-none');
-        if (val === 'image') document.getElementById('bg-image-field').classList.remove('d-none');
+        document.querySelectorAll('.bg-section-field').forEach(el => el.classList.add('d-non e'));
+        if (val === 'color') document.getElementById('bg-color-field').classList.remove('d -non e');
+        if (val === 'image') document.getElementById('bg-image-field').classList.remove('d- non e');
         if (val === 'gradient') document.getElementById('bg-gradient-field').classList.remove('d-none');
     }
     // Init
