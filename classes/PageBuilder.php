@@ -60,9 +60,9 @@ class PageBuilder
             }
         }
 
-        // Text Color override
-        $textColor = $adv['typography']['color'] ?? $section['text_color'] ?? 'inherit';
-        $style .= "color: $textColor; ";
+        // Text Align override
+        $textAlign = $adv['typography']['align'] ?? $section['text_align'] ?? 'left';
+        $style .= "text-align: $textAlign; ";
 
         // Border
         if (!empty($adv['border']['width'])) {
@@ -102,15 +102,44 @@ class PageBuilder
         $containerClass = ($adv['layout']['width'] ?? 'boxed') === 'full' ? 'container-fluid' : 'container';
 
         echo "<div class='$containerClass position-relative' style='z-index: 2;'>";
-        echo '<div class="row align-items-center">'; // Flex alignment handled here if needed
+        echo '<div class="row align-items-center justify-content-' . ($textAlign === 'center' ? 'center' : 'start') . '">'; // Flex alignment
         echo '<div class="col-12">';
 
         if (empty($elements) && !empty($section['content'])) {
             echo $section['content'];
         }
 
-        foreach ($elements as $el) {
-            self::renderElement($el);
+        // SMART GRID RENDERING SYSTEM
+        $count = count($elements);
+        for ($i = 0; $i < $count; $i++) {
+            $el = $elements[$i];
+            $isCard = ($el['type'] === 'card');
+
+            if ($isCard) {
+                // Check if we need to OPEN a new grid row
+                // We open if this is the first card, OR the previous one wasn't a card
+                $prevWasCard = ($i > 0) && ($elements[$i - 1]['type'] === 'card');
+
+                if (!$prevWasCard) {
+                    echo '<div class="row justify-content-center">'; // Start Card Grid
+                }
+
+                // Render the card wrapper
+                echo '<div class="col-md-6 col-lg-4 mb-4">';
+                self::renderElement($el);
+                echo '</div>';
+
+                // Check if we need to CLOSE the grid row
+                // We close if this is the last element, OR the next one isn't a card
+                $nextIsCard = ($i < $count - 1) && ($elements[$i + 1]['type'] === 'card');
+
+                if (!$nextIsCard) {
+                    echo '</div>'; // End Card Grid
+                }
+            } else {
+                // Normal Element Rendering
+                self::renderElement($el);
+            }
         }
 
         echo '</div></div></div>'; // End Col, Row, Container
@@ -145,7 +174,7 @@ class PageBuilder
         $s = json_decode($el['settings'], true) ?? [];
         $style = self::generateStyle($s);
         $content = $el['content'];
-        $wrapperStyle = "text-align: " . ($s['text_align'] ?? 'left') . "; margin-bottom: " . ($s['margin_bottom'] ?? '20px') . "; margin-top: " . ($s['margin_top'] ?? '0') . ";";
+        $wrapperStyle = "text-align: " . ($s['text_align'] ?? 'inherit') . "; margin-bottom: " . ($s['margin_bottom'] ?? '20px') . "; margin-top: " . ($s['margin_top'] ?? '0') . ";";
         echo "<div class='element-wrapper element-" . $el['type'] . "' style='$wrapperStyle'>";
         switch ($el['type']) {
             case 'heading':
