@@ -1,104 +1,135 @@
 <?php
-// Standard Admin Page Setup
-require_once '../includes/config.php';
-require_once '../classes/Auth.php';
+// Enable Error Reporting
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+// Start Session
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+
+// ---------------------------------------------------------
+// DATABASE CONNECTION SETUP
+// ---------------------------------------------------------
+// Attempt to load standard config first
+if (file_exists(__DIR__ . '/../includes/config.php')) {
+    require_once __DIR__ . '/../includes/config.php';
+}
+
+// Global Validation Helper (defined early)
+if (!function_exists('val')) {
+    function val($arr, $keys, $default = '')
+    {
+        foreach ($keys as $k) {
+            if (!isset($arr[$k]))
+                return $default;
+            $arr = $arr[$k];
+        }
+        return $arr;
+    }
+}
+
+// Check Connection (Fallback to manual if needed/config broke)
+if (!isset($pdo)) {
+    $host = 'localhost';
+    $dbname = 'tourism_cms';
+    $username = 'root';
+    $password = '';
+    $port = 3307;
+
+    try {
+        $dsn = "mysql:host=$host;port=$port;dbname=$dbname;charset=utf8";
+        $pdo = new PDO($dsn, $username, $password);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+
+        // Define BASE_URL if missing
+        if (!defined('BASE_URL')) {
+            define('BASE_URL', 'http://localhost/SaoirseTours/');
+        }
+    } catch (PDOException $e) {
+        die("<h3>Database Connection Error</h3><p>" . $e->getMessage() . "</p>");
+    }
+}
 
 // Auth Check (Standardized)
-$auth = new Auth($pdo);
-$auth->requireLogin();
-
-// ---------------------------------------------------------
-// HEADER BUILDER LOGIC
-// ---------------------------------------------------------
-
-// Helper for nested array access
-function val($arr, $keys, $default = '')
-{
-    foreach ($keys as $k) {
-        if (!isset($arr[$k]))
-            return $default;
-        $arr = $arr[$k];
+// If Auth class is available, use it. Otherwise manual check.
+if (file_exists(__DIR__ . '/../classes/Auth.php')) {
+    require_once __DIR__ . '/../classes/Auth.php';
+    $auth = new Auth($pdo);
+    $auth->requireLogin();
+} else {
+    // Fallback Auth
+    if (!isset($_SESSION['admin_logged_in']) && !isset($_SESSION['user_id'])) {
+        header("Location: login.php");
+        exit;
     }
-    return $arr;
 }
 
-// Global Variables
+// Initialize Success Message
 $success = "";
-
-// SELF-HEALING: Auto-Create Table if Missing
-try {
-    $stmt = $pdo->query("SELECT 1 FROM header_settings LIMIT 1");
-} catch (PDOException $e) {
-    try {
-        $sql = "CREATE TABLE IF NOT EXISTS `header_settings` (
-          `id` int(11) NOT NULL AUTO_INCREMENT,
-          `is_active` tinyint(1) DEFAULT 1,
-          `settings` longtext, 
-          `updated_at` timestamp DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-          PRIMARY KEY (`id`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
-        $pdo->exec($sql);
-
-        // Insert Default
-        $defaultJson = json_encode([
-            'general' => ['layout' => 'logo_left', 'type' => 'standard', 'container' => 'container', 'sticky' => false],
-            'rows' => [
-                'top_bar' => ['visible' => false, 'bg_color' => '#3a4c40', 'text_color' => '#ffffff', 'text' => 'Call us: +94 123 456 789'],
-                'main_header' => ['height' => '80px', 'bg_color' => '#ffffff']
-            ],
-            'design' => [
-                'typography' => ['logo_color' => '#486856', 'menu_color' => '#3a4c40', 'menu_hover' => '#486856'],
-                'borders' => ['bottom_width' => '1px', 'bottom_color' => '#e0e0e0']
-            ]
-        ]);
-
-        $stmt = $pdo->prepare("INSERT INTO header_settings (id, settings) VALUES (1, ?)");
-        $stmt->execute([$defaultJson]);
-
-    } catch (PDOException $ex) {
-        die("<h3>Critical Error: Could not create header_settings table.</h3><br>" . $ex->getMessage());
-    }
-}
 
 // Handle Save
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $settings = [
         'general' => [
-            'layout' => $_POST['layout'],
-            'type' => $_POST['type'],
-            'container' => $_POST['container'],
+            'layout' => $_POST['layout'] ?? 'logo_left',
+            'type' => $_POST['type'] ?? 'standard',
+            'container' => $_POST['container'] ?? 'container',
             'sticky' => isset($_POST['sticky']) ? 1 : 0
         ],
         'rows' => [
             'top_bar' => [
                 'visible' => isset($_POST['top_bar_visible']) ? 1 : 0,
-                'bg_color' => $_POST['top_bar_bg'],
-                'text_color' => $_POST['top_bar_text_color'],
-                'text' => $_POST['top_bar_content']
+                'bg_color' => $_POST['top_bar_bg'] ?? '#3a4c40',
+                'text_color' => $_POST['top_bar_text_color'] ?? '#ffffff',
+                'text' => $_POST['top_bar_content'] ?? ''
             ],
             'main_header' => [
-                'height' => $_POST['header_height'],
-                'bg_color' => $_POST['header_bg']
+                'height' => $_POST['header_height'] ?? '80px',
+                'bg_color' => $_POST['header_bg'] ?? '#ffffff'
             ]
         ],
         'design' => [
+            // User requested to NOT mix logo styles here as they are in theme_customizer.
+            // Keeping menu colors as they are specific to the header instance.
             'typography' => [
-                'logo_color' => $_POST['logo_color'],
-                'menu_color' => $_POST['menu_color'],
-                'menu_hover' => $_POST['menu_hover']
+                'menu_color' => $_POST['menu_color'] ?? '#333333',
+                'menu_hover' => $_POST['menu_hover'] ?? '#000000'
             ],
             'borders' => [
-                'bottom_width' => $_POST['border_bottom'],
-                'bottom_color' => $_POST['border_color']
+                'bottom_width' => $_POST['border_bottom'] ?? '1px',
+                'bottom_color' => $_POST['border_color'] ?? '#e0e0e0'
             ]
         ]
     ];
 
     $json = json_encode($settings);
 
-    // Update
-    $stmt = $pdo->prepare("UPDATE header_settings SET settings = ? WHERE id = 1");
-    $stmt->execute([$json]);
+    // Self-Healing Table Check
+    try {
+        $check = $pdo->query("SELECT id FROM header_settings LIMIT 1");
+    } catch (PDOException $e) {
+        $pdo->exec("CREATE TABLE IF NOT EXISTS `header_settings` (
+          `id` int(11) NOT NULL AUTO_INCREMENT,
+          `is_active` tinyint(1) DEFAULT 1,
+          `settings` longtext, 
+          `updated_at` timestamp DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+          PRIMARY KEY (`id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;");
+        $pdo->exec("INSERT INTO header_settings (id, settings) VALUES (1, '$json')");
+    }
+
+    // Upsert
+    $existing = $pdo->query("SELECT id FROM header_settings WHERE id = 1")->fetch();
+    if ($existing) {
+        $stmt = $pdo->prepare("UPDATE header_settings SET settings = ? WHERE id = 1");
+        $stmt->execute([$json]);
+    } else {
+        $stmt = $pdo->prepare("INSERT INTO header_settings (id, settings) VALUES (1, ?)");
+        $stmt->execute([$json]);
+    }
     $success = "Header settings saved successfully!";
 }
 
@@ -214,24 +245,41 @@ try {
                             <div class="tab-pane fade" id="tab-design">
                                 <h5 class="mb-3">Colors</h5>
                                 <div class="row g-3">
-                                    <div class="col-md-4"><label>Header BG</label><input type="color"
+                                    <div class="col-md-6"><label>Header BG</label><input type="color"
                                             class="form-control w-100" name="header_bg"
                                             value="<?php echo val($s, ['rows', 'main_header', 'bg_color'], '#ffffff'); ?>">
                                     </div>
-                                    <div class="col-md-4"><label>Logo Color</label><input type="color"
-                                            class="form-control w-100" name="logo_color"
-                                            value="<?php echo val($s, ['design', 'typography', 'logo_color'], '#000000'); ?>">
-                                    </div>
-                                    <div class="col-md-4"><label>Menu Color</label><input type="color"
+                                    <div class="col-md-3"><label>Menu Color</label><input type="color"
                                             class="form-control w-100" name="menu_color"
                                             value="<?php echo val($s, ['design', 'typography', 'menu_color'], '#333333'); ?>">
                                     </div>
+                                    <div class="col-md-3"><label>Menu Hover</label><input type="color"
+                                            class="form-control w-100" name="menu_hover"
+                                            value="<?php echo val($s, ['design', 'typography', 'menu_hover'], '#000000'); ?>">
+                                    </div>
                                 </div>
-                                <h5 class="mt-4 mb-3">Layout</h5>
+                                <h5 class="mt-4 mb-3">Layout & Borders</h5>
                                 <div class="row g-3">
                                     <div class="col-md-6"><label>Height</label><input type="text" class="form-control"
                                             name="header_height"
                                             value="<?php echo val($s, ['rows', 'main_header', 'height'], '80px'); ?>">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Bottom Border</label>
+                                        <select class="form-select" name="border_bottom">
+                                            <option value="0px" <?php echo val($s, ['design', 'borders', 'bottom_width']) == '0px' ? 'selected' : ''; ?>>None
+                                            </option>
+                                            <option value="1px" <?php echo val($s, ['design', 'borders', 'bottom_width']) == '1px' ? 'selected' : ''; ?>>Thin
+                                                (1px)</option>
+                                            <option value="2px" <?php echo val($s, ['design', 'borders', 'bottom_width']) == '2px' ? 'selected' : ''; ?>>Thick
+                                                (2px)</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Border Color</label>
+                                        <input type="color" class="form-control form-control-color w-100"
+                                            name="border_color"
+                                            value="<?php echo val($s, ['design', 'borders', 'bottom_color'], '#eeeeee'); ?>">
                                     </div>
                                 </div>
                             </div>
@@ -246,6 +294,11 @@ try {
                 <div class="card shadow">
                     <div class="card-body">
                         <p class="text-muted">Changes apply immediately.</p>
+                        <hr>
+                        <div class="alert alert-info small">
+                            <strong>Note:</strong> Logo and Font details are managed in <a
+                                href="theme_customizer.php">Global Theme Customizer</a>.
+                        </div>
                     </div>
                 </div>
             </div>

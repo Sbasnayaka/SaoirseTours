@@ -45,8 +45,8 @@ $meta_desc = $page['meta_desc'] ?? $settings['tagline'];
     $globalTheme = ThemeHelper::getTheme($pdo);
     ?>
 
-    <?php if (!empty($settingsRow['favicon'])): ?>
-        <link rel="icon" href="<?php echo BASE_URL; ?>uploads/<?php echo $settingsRow['favicon']; ?>" type="image/x-icon">
+    <?php if (!empty($settings['favicon'])): ?>
+        <link rel="icon" href="<?php echo BASE_URL; ?>uploads/<?php echo $settings['favicon']; ?>" type="image/x-icon">
     <?php endif; ?>
 
     <style>

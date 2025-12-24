@@ -3,6 +3,7 @@ class HeaderRenderer
 {
     private $pdo;
     private $settings;
+    private $globalSettings;
 
     public function __construct($pdo)
     {
@@ -12,20 +13,25 @@ class HeaderRenderer
 
     private function loadSettings()
     {
+        // 1. Fetch Header Builder Settings
         $stmt = $this->pdo->query("SELECT settings FROM header_settings WHERE id = 1");
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        // Default Fallback
         $default = [
             'general' => ['layout' => 'logo_left', 'type' => 'standard', 'container' => 'container'],
             'design' => ['typography' => ['menu_color' => '#333']]
         ];
-
         $this->settings = $row ? json_decode($row['settings'], true) : $default;
+
+        // 2. Fetch Global Settings (Logo, Site Title)
+        $stmtGlobal = $this->pdo->query("SELECT logo, site_title FROM settings WHERE id = 1");
+        $this->globalSettings = $stmtGlobal->fetch(PDO::FETCH_ASSOC);
     }
 
     public function render()
     {
         $s = $this->settings;
+        $g = $this->globalSettings;
+
         $layout = $s['general']['layout'] ?? 'logo_left';
         $stickyClass = ($s['general']['sticky'] ?? 0) ? 'sticky-top' : '';
         $typeClass = ($s['general']['type'] ?? 'standard') === 'transparent' ? 'header-transparent' : 'header-standard';
@@ -52,8 +58,17 @@ class HeaderRenderer
                 <span class="navbar-toggler-icon"></span>
               </button>';
 
-        // LOGO
-        $logo = "<a class='navbar-brand fw-bold' href='home'>SaoirseTours</a>";
+        // LOGO LOGIC (Dynamic)
+        $logoHtml = "";
+        if (!empty($g['logo']) && file_exists(__DIR__ . '/../uploads/' . $g['logo'])) {
+            $logoHtml = "<a class='navbar-brand' href='home'>
+                            <img src='uploads/{$g['logo']}' alt='Logo' style='max-height: 50px;'>
+                          </a>";
+        } else {
+            // Fallback to text
+            $siteTitle = $g['site_title'] ?? 'SaoirseTours';
+            $logoHtml = "<a class='navbar-brand fw-bold' href='home'>$siteTitle</a>";
+        }
 
         // MENU ITEMS
         $menuInfo = '<ul class="navbar-nav gap-3">
@@ -68,16 +83,16 @@ class HeaderRenderer
         // LAYOUT LOGIC
         if ($layout === 'logo_center') {
             // Center Layout
-            echo "<div class='d-flex w-100 justify-content-between align-items-center d-lg-none'>$logo</div>"; // Mobile Logo
+            echo "<div class='d-flex w-100 justify-content-between align-items-center d-lg-none'>$logoHtml</div>"; // Mobile Logo
             echo "<div class='collapse navbar-collapse justify-content-center text-center' id='mainNav'>";
             echo "<div class='d-flex flex-column align-items-center'>";
-            echo "<div class='mb-3 d-none d-lg-block'>$logo</div>"; // Desktop Centered Logo
+            echo "<div class='mb-3 d-none d-lg-block'>$logoHtml</div>"; // Desktop Centered Logo
             echo $menuInfo;
             echo "</div>";
             echo "</div>";
         } else {
             // Left Layout (Standard)
-            echo $logo;
+            echo $logoHtml;
             echo "<div class='collapse navbar-collapse justify-content-end' id='mainNav'>";
             echo $menuInfo;
             echo "</div>";
@@ -97,7 +112,7 @@ class HeaderRenderer
         $bgColor = $r['bg_color'] ?? '#ffffff';
         $menuColor = $d['typography']['menu_color'] ?? '#333';
         $menuHover = $d['typography']['menu_hover'] ?? '#000';
-        $logoColor = $d['typography']['logo_color'] ?? '#000';
+        $logoColor = $d['typography']['logo_color'] ?? '#000'; // Still used for fallback text
         $height = $r['height'] ?? '80px';
         $bottomBorder = $d['borders']['bottom_width'] ?? '0px';
         $borderColor = $d['borders']['bottom_color'] ?? '#eee';
@@ -112,6 +127,14 @@ class HeaderRenderer
             .navbar-brand {
                 color: $logoColor !important;
                 font-size: 1.5rem;
+                display: flex;
+                align-items: center;
+            }
+            .navbar-brand img {
+                transition: transform 0.3s;
+            }
+            .navbar-brand:hover img {
+                transform: scale(1.05);
             }
             .nav-link {
                 color: $menuColor !important;
