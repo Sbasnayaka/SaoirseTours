@@ -90,30 +90,10 @@ $meta_desc = $page['meta_desc'] ?? $settings['tagline'];
 </head>
 
 <body class="d-flex flex-column min-vh-100">
-    <nav class="navbar navbar-expand-lg border-bottom shadow-sm">
-        <div class="container">
-            <a class="navbar-brand d-flex align-items-center gap-2" href="<?php echo BASE_URL; ?>">
-                <?php if (!empty($settings['logo'])): ?>
-                    <img src="<?php echo BASE_URL; ?>uploads/<?php echo $settings['logo']; ?>"
-                        alt="<?php echo htmlspecialchars($settings['site_title']); ?>" class="img-fluid">
-                <?php else: ?>
-                    <span class="fw-bold fs-3 text-primary"><?php echo htmlspecialchars($settings['site_title']); ?></span>
-                <?php endif; ?>
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="<?php echo BASE_URL; ?>home">Home</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?php echo BASE_URL; ?>about">About</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?php echo BASE_URL; ?>packages">Packages</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?php echo BASE_URL; ?>services">Services</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?php echo BASE_URL; ?>gallery">Gallery</a></li>
-                    <li class="nav-item"><a class="nav-link" href="<?php echo BASE_URL; ?>contact">Contact</a></li>
-                </ul>
-                <a href="<?php echo BASE_URL; ?>contact" class="btn btn-primary ms-lg-3">Book Now</a>
-            </div>
-        </div>
-    </nav>
+    <?php
+    // Header Renderer Engine
+    require_once __DIR__ . '/../classes/HeaderRenderer.php';
+    $headerBuilder = new HeaderRenderer($pdo);
+    $headerBuilder->render();
+    ?>
     <main class="flex-grow-1">

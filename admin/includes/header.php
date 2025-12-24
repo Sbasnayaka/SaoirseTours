@@ -215,6 +215,9 @@
                 <li><a href="theme_customizer.php"
                         class="<?php echo basename($_SERVER['PHP_SELF']) == 'theme_customizer.php' ? 'active' : ''; ?>"><i
                             class="bi bi-palette-fill"></i> Global Theme</a></li>
+                <li><a href="header_builder.php"
+                        class="<?php echo basename($_SERVER['PHP_SELF']) == 'header_builder.php' ? 'active' : ''; ?>"><i
+                            class="bi bi-window-desktop"></i> Header Builder</a></li>
                 <li><a href="settings.php"
                         class="<?php echo basename($_SERVER['PHP_SELF']) == 'settings.php' ? 'active' : ''; ?>"><i
                             class="bi bi-sliders"></i> Site Identity</a></li>
