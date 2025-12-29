@@ -513,47 +513,79 @@ include 'includes/header.php';
                     <!-- ... inside Typography Tab ... -->
                     <!-- TYPOGRAPHY -->
                     <div class="tab-pane fade" id="tab-typography">
-                        <h6>Section Typography</h6>
+                        <h6 class="mb-3">Section Typography</h6>
+
+                        <!-- Row 1: Color & Align -->
+                        <div class="row g-3 mb-3 border-bottom pb-3">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Text Color</label>
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="color" class="form-control form-control-color" name="typography[color]"
+                                        value="<?php echo $adv['typography']['color'] ?? '#000000'; ?>"
+                                        title="Choose Color">
+                                    <small class="text-muted">Override text color</small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-bold">Alignment</label>
+                                <div class="btn-group w-100" role="group">
+                                    <input type="radio" class="btn-check" name="typography[align]" value="left"
+                                        id="tAlignL" <?php echo ($adv['typography']['align'] ?? '') == 'left' ? 'checked' : ''; ?>>
+                                    <label class="btn btn-outline-secondary" for="tAlignL"><i
+                                            class="bi bi-text-left"></i></label>
+
+                                    <input type="radio" class="btn-check" name="typography[align]" value="center"
+                                        id="tAlignC" <?php echo ($adv['typography']['align'] ?? '') == 'center' ? 'checked' : ''; ?>>
+                                    <label class="btn btn-outline-secondary" for="tAlignC"><i
+                                            class="bi bi-text-center"></i></label>
+
+                                    <input type="radio" class="btn-check" name="typography[align]" value="right"
+                                        id="tAlignR" <?php echo ($adv['typography']['align'] ?? '') == 'right' ? 'checked' : ''; ?>>
+                                    <label class="btn btn-outline-secondary" for="tAlignR"><i
+                                            class="bi bi-text-right"></i></label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Row 2: Font Family -->
+                        <div class="mb-3">
+                            <label class="form-label small fw-bold">Font Family</label>
+                            <select class="form-select" name="typography[font_family]">
+                                <option value="inherit" <?php echo ($adv['typography']['font_family'] ?? '') == 'inherit' ? 'selected' : ''; ?>>Inherit Global Font</option>
+                                <option value="'Inter', sans-serif" <?php echo ($adv['typography']['font_family'] ?? '') == "'Inter', sans-serif" ? 'selected' : ''; ?>>Inter (Clean Sans)</option>
+                                <option value="'Playfair Display', serif" <?php echo ($adv['typography']['font_family'] ?? '') == "'Playfair Display', serif" ? 'selected' : ''; ?>>Playfair Display (Elegant
+                                    Serif)</option>
+                                <option value="'Roboto', sans-serif" <?php echo ($adv['typography']['font_family'] ?? '') == "'Roboto', sans-serif" ? 'selected' : ''; ?>>Roboto</option>
+                                <option value="monospace" <?php echo ($adv['typography']['font_family'] ?? '') == "monospace" ? 'selected' : ''; ?>>Monospace</option>
+                            </select>
+                        </div>
+
+                        <!-- Row 3: Size & Weight -->
                         <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Text Color</label>
-                                <input type="color" class="form-control form-control-color w-100"
-                                    name="typography[color]" value="<?php echo $adv['typography']['color'] ?? ''; ?>">
+                            <div class="col-6">
+                                <label class="form-label small fw-bold">Font Size</label>
+                                <div class="input-group input-group-sm">
+                                    <input type="text" class="form-control" name="typography[font_size]"
+                                        value="<?php echo $adv['typography']['font_size'] ?? ''; ?>"
+                                        placeholder="e.g. 16">
+                                    <span class="input-group-text">px</span>
+                                </div>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Alignment</label>
-                                <select class="form-select" name="typography[align]">
-                                    <option value="left" <?php echo ($adv['typography']['align'] ?? '') == 'left' ? 'selected' : ''; ?>>Left</option>
-                                    <option value="center" <?php echo ($adv['typography']['align'] ?? '') == 'center' ? 'selected' : ''; ?>>Center</option>
-                                    <option value="right" <?php echo ($adv['typography']['align'] ?? '') == 'right' ? 'selected' : ''; ?>>Right</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Font Family</label>
-                                <select class="form-select" name="typography[font_family]">
-                                    <option value="inherit" <?php echo ($adv['typography']['font_family'] ?? '') == 'inherit' ? 'selected' : ''; ?>>Inherit</option>
-                                    <option value="'Inter', sans-serif" <?php echo ($adv['typography']['font_family'] ?? '') == "'Inter', sans-serif" ? 'selected' : ''; ?>>Inter</option>
-                                    <option value="'Playfair Display', serif" <?php echo ($adv['typography']['font_family'] ?? '') == "'Playfair Display', serif" ? 'selected' : ''; ?>>Playfair Display</option>
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Font Size</label>
-                                <input type="text" class="form-control" name="typography[font_size]"
-                                    value="<?php echo $adv['typography']['font_size'] ?? ''; ?>"
-                                    placeholder="e.g. 16px">
-                            </div>
-                            <div class="col-md-4">
-                                <label class="form-label">Font Weight</label>
-                                <select class="form-select" name="typography[font_weight]">
+                            <div class="col-6">
+                                <label class="form-label small fw-bold">Font Weight</label>
+                                <select class="form-select form-select-sm" name="typography[font_weight]">
                                     <option value="" <?php echo ($adv['typography']['font_weight'] ?? '') == '' ? 'selected' : ''; ?>>Default</option>
                                     <option value="300" <?php echo ($adv['typography']['font_weight'] ?? '') == '300' ? 'selected' : ''; ?>>Light (300)</option>
                                     <option value="400" <?php echo ($adv['typography']['font_weight'] ?? '') == '400' ? 'selected' : ''; ?>>Normal (400)</option>
+                                    <option value="600" <?php echo ($adv['typography']['font_weight'] ?? '') == '600' ? 'selected' : ''; ?>>Semi-Bold (600)</option>
                                     <option value="700" <?php echo ($adv['typography']['font_weight'] ?? '') == '700' ? 'selected' : ''; ?>>Bold (700)</option>
                                 </select>
                             </div>
                         </div>
-                        <div class="form-text mt-2">These settings apply to all text in this section unless overridden
-                            by individual elements.</div>
+                        <div class="alert alert-light mt-3 py-2 small border">
+                            <i class="bi bi-info-circle"></i> These settings will apply to <strong>all text</strong> in
+                            this section. Individual elements can override this.
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer bg-light">
