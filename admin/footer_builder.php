@@ -133,7 +133,10 @@ $s = $curr ? json_decode($curr['settings'], true) : [];
 
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Footer Builder Engine</h1>
+        <div class="d-flex align-items-center gap-3">
+            <a href="dashboard.php" class="btn btn-outline-secondary btn-sm"><i class="bi bi-arrow-left"></i> Back</a>
+            <h1 class="h3 mb-0 text-gray-800">Footer Builder Engine</h1>
+        </div>
         <a href="../home" target="_blank" class="btn btn-outline-primary"><i class="bi bi-eye"></i> View Site</a>
     </div>
 
