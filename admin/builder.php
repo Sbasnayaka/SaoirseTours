@@ -42,6 +42,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $content = '';
             $s['height'] = '50px';
         }
+        if ($type == 'map') {
+            $content = '';
+            $s['height'] = '400px';
+        }
         $pdo->prepare("INSERT INTO section_elements (section_id, type, content, settings, display_order) VALUES (?, ?, ?, ?, 99)")->execute([$section_id, $type, $content, json_encode($s)]);
     }
 
@@ -160,47 +164,62 @@ include 'includes/header.php';
                                 <form method="POST" enctype="multipart/form-data">
                                     <input type="hidden" name="update_element" value="1"><input type="hidden"
                                         name="element_id" value="<?php echo $el['id']; ?>">
-                                    
+
                                     <!-- Common: Order -->
                                     <div class="row g-2 mb-2 align-items-center bg-white p-2 border rounded">
                                         <div class="col-auto"><label class="small fw-bold mb-0">Order:</label></div>
-                                        <div class="col-auto"><input type="number" class="form-control form-control-sm" style="width: 70px;" name="display_order" value="<?php echo $el['display_order']; ?>"></div>
-                                        <?php if(in_array($el['type'], ['heading', 'text', 'button'])): ?>
-                                        <div class="col-auto ms-auto"><label class="small fw-bold mb-0">Align:</label></div>
-                                        <div class="col-auto">
-                                            <div class="btn-group btn-group-sm" role="group">
-                                                <input type="radio" class="btn-check" name="settings[align]" value="left" id="aL<?php echo $el['id']; ?>" <?php echo ($s['align']??'left')=='left'?'checked':''; ?>>
-                                                <label class="btn btn-outline-secondary" for="aL<?php echo $el['id']; ?>"><i class="bi bi-text-left"></i></label>
+                                        <div class="col-auto"><input type="number" class="form-control form-control-sm"
+                                                style="width: 70px;" name="display_order"
+                                                value="<?php echo $el['display_order']; ?>"></div>
+                                        <?php if (in_array($el['type'], ['heading', 'text', 'button'])): ?>
+                                            <div class="col-auto ms-auto"><label class="small fw-bold mb-0">Align:</label></div>
+                                            <div class="col-auto">
+                                                <div class="btn-group btn-group-sm" role="group">
+                                                    <input type="radio" class="btn-check" name="settings[align]" value="left"
+                                                        id="aL<?php echo $el['id']; ?>" <?php echo ($s['align'] ?? 'left') == 'left' ? 'checked' : ''; ?>>
+                                                    <label class="btn btn-outline-secondary" for="aL<?php echo $el['id']; ?>"><i
+                                                            class="bi bi-text-left"></i></label>
 
-                                                <input type="radio" class="btn-check" name="settings[align]" value="center" id="aC<?php echo $el['id']; ?>" <?php echo ($s['align']??'')=='center'?'checked':''; ?>>
-                                                <label class="btn btn-outline-secondary" for="aC<?php echo $el['id']; ?>"><i class="bi bi-text-center"></i></label>
+                                                    <input type="radio" class="btn-check" name="settings[align]" value="center"
+                                                        id="aC<?php echo $el['id']; ?>" <?php echo ($s['align'] ?? '') == 'center' ? 'checked' : ''; ?>>
+                                                    <label class="btn btn-outline-secondary" for="aC<?php echo $el['id']; ?>"><i
+                                                            class="bi bi-text-center"></i></label>
 
-                                                <input type="radio" class="btn-check" name="settings[align]" value="right" id="aR<?php echo $el['id']; ?>" <?php echo ($s['align']??'')=='right'?'checked':''; ?>>
-                                                <label class="btn btn-outline-secondary" for="aR<?php echo $el['id']; ?>"><i class="bi bi-text-right"></i></label>
+                                                    <input type="radio" class="btn-check" name="settings[align]" value="right"
+                                                        id="aR<?php echo $el['id']; ?>" <?php echo ($s['align'] ?? '') == 'right' ? 'checked' : ''; ?>>
+                                                    <label class="btn btn-outline-secondary" for="aR<?php echo $el['id']; ?>"><i
+                                                            class="bi bi-text-right"></i></label>
+                                                </div>
                                             </div>
-                                        </div>
                                         <?php endif; ?>
                                     </div>
 
                                     <!-- Type Specific -->
                                     <?php if ($el['type'] == 'text'): ?>
-                                        <textarea class="form-control ckeditor-lite" name="content"><?php echo htmlspecialchars($el['content']); ?></textarea>
-                                    
+                                        <textarea class="form-control ckeditor-lite"
+                                            name="content"><?php echo htmlspecialchars($el['content']); ?></textarea>
+
                                     <?php elseif ($el['type'] == 'heading'): ?>
                                         <label class="small">Heading Text</label>
-                                        <input type="text" class="form-control mb-2 fw-bold" name="content" value="<?php echo htmlspecialchars($el['content']); ?>">
+                                        <input type="text" class="form-control mb-2 fw-bold" name="content"
+                                            value="<?php echo htmlspecialchars($el['content']); ?>">
                                         <label class="small">Tag</label>
                                         <select class="form-select form-select-sm w-auto d-inline-block" name="settings[tag]">
-                                            <option value="h1" <?php echo ($s['tag']??'')=='h1'?'selected':''; ?>>H1</option>
-                                            <option value="h2" <?php echo ($s['tag']??'h2')=='h2'?'selected':''; ?>>H2</option>
-                                            <option value="h3" <?php echo ($s['tag']??'')=='h3'?'selected':''; ?>>H3</option>
+                                            <option value="h1" <?php echo ($s['tag'] ?? '') == 'h1' ? 'selected' : ''; ?>>H1
+                                            </option>
+                                            <option value="h2" <?php echo ($s['tag'] ?? 'h2') == 'h2' ? 'selected' : ''; ?>>H2
+                                            </option>
+                                            <option value="h3" <?php echo ($s['tag'] ?? '') == 'h3' ? 'selected' : ''; ?>>H3
+                                            </option>
                                         </select>
 
                                     <?php elseif ($el['type'] == 'image'): ?>
                                         <div class="d-flex align-items-start gap-3 mb-2">
-                                            <?php if($el['content']): ?>
+                                            <?php if ($el['content']): ?>
                                                 <div class="text-center">
-                                                    <img src="../uploads/<?php echo $el['content']; ?>" style="height: 80px; width: 80px; object-fit: cover;" class="rounded border">
+                                                    <img src="../uploads/<?php echo $el['content']; ?>"
+                                                        style="height: 80px; width: 80px; object-fit: cover;"
+                                                        class="rounded border">
                                                     <input type="hidden" name="content" value="<?php echo $el['content']; ?>">
                                                 </div>
                                             <?php endif; ?>
@@ -208,7 +227,8 @@ include 'includes/header.php';
                                                 <label class="small">Upload Image</label>
                                                 <input type="file" class="form-control form-control-sm mb-2" name="el_image">
                                                 <label class="small">Link URL (Optional)</label>
-                                                <input type="text" class="form-control form-control-sm" name="settings[url]" value="<?php echo $s['url'] ?? ''; ?>" placeholder="https://...">
+                                                <input type="text" class="form-control form-control-sm" name="settings[url]"
+                                                    value="<?php echo $s['url'] ?? ''; ?>" placeholder="https://...">
                                             </div>
                                         </div>
 
@@ -216,26 +236,43 @@ include 'includes/header.php';
                                         <div class="row g-2">
                                             <div class="col-md-6">
                                                 <label class="small">Label</label>
-                                                <input type="text" class="form-control form-control-sm" name="content" value="<?php echo htmlspecialchars($el['content']); ?>">
+                                                <input type="text" class="form-control form-control-sm" name="content"
+                                                    value="<?php echo htmlspecialchars($el['content']); ?>">
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="small">Link URL</label>
-                                                <input type="text" class="form-control form-control-sm" name="settings[url]" value="<?php echo $s['url'] ?? ''; ?>">
+                                                <input type="text" class="form-control form-control-sm" name="settings[url]"
+                                                    value="<?php echo $s['url'] ?? ''; ?>">
                                             </div>
                                             <div class="col-md-12">
                                                 <label class="small">Style</label>
                                                 <select class="form-select form-select-sm" name="settings[style]">
-                                                    <option value="btn-primary" <?php echo ($s['style']??'')=='btn-primary'?'selected':''; ?>>Primary Green</option>
-                                                    <option value="btn-dark" <?php echo ($s['style']??'')=='btn-dark'?'selected':''; ?>>Dark</option>
-                                                    <option value="btn-outline-primary" <?php echo ($s['style']??'')=='btn-outline-primary'?'selected':''; ?>>Outline Green</option>
-                                                    <option value="btn-outline-dark" <?php echo ($s['style']??'')=='btn-outline-dark'?'selected':''; ?>>Outline Dark</option>
+                                                    <option value="btn-primary" <?php echo ($s['style'] ?? '') == 'btn-primary' ? 'selected' : ''; ?>>Primary Green
+                                                    </option>
+                                                    <option value="btn-dark" <?php echo ($s['style'] ?? '') == 'btn-dark' ? 'selected' : ''; ?>>Dark</option>
+                                                    <option value="btn-outline-primary" <?php echo ($s['style'] ?? '') == 'btn-outline-primary' ? 'selected' : ''; ?>>Outline Green
+                                                    </option>
+                                                    <option value="btn-outline-dark" <?php echo ($s['style'] ?? '') == 'btn-outline-dark' ? 'selected' : ''; ?>>Outline Dark
+                                                    </option>
                                                 </select>
                                             </div>
                                         </div>
 
                                     <?php elseif ($el['type'] == 'spacer'): ?>
                                         <label class="small">Height</label>
-                                        <input type="text" class="form-control form-control-sm" name="settings[height]" value="<?php echo $s['height'] ?? '50px'; ?>">
+                                        <input type="text" class="form-control form-control-sm" name="settings[height]"
+                                            value="<?php echo $s['height'] ?? '50px'; ?>">
+
+                                    <?php elseif ($el['type'] == 'map'): ?>
+                                        <div class="mb-2">
+                                            <label class="small fw-bold">Embed Code (iframe)</label>
+                                            <textarea class="form-control form-control-sm font-monospace" name="content"
+                                                rows="3"
+                                                placeholder="<iframe src='...'></iframe>"><?php echo htmlspecialchars($el['content']); ?></textarea>
+                                        </div>
+                                        <label class="small">Height</label>
+                                        <input type="text" class="form-control form-control-sm" name="settings[height]"
+                                            value="<?php echo $s['height'] ?? '400px'; ?>">
 
                                     <?php else: ?>
                                         <input type="text" class="form-control" name="content"
@@ -259,7 +296,7 @@ include 'includes/header.php';
             <div class="card shadow-sm">
                 <div class="card-body p-2">
                     <div class="row g-2">
-                        <?php foreach (['heading', 'text', 'image', 'button', 'card', 'video', 'spacer', 'divider'] as $t): ?>
+                        <?php foreach (['heading', 'text', 'image', 'button', 'card', 'video', 'map', 'spacer', 'divider'] as $t): ?>
                             <div class="col-6">
                                 <form method="POST"><input type="hidden" name="add_element" value="1"><input type="hidden"
                                         name="type" value="<?php echo $t; ?>"><button
@@ -471,23 +508,52 @@ include 'includes/header.php';
                         </div>
                     </div>
 
+
+
+                    <!-- ... inside Typography Tab ... -->
                     <!-- TYPOGRAPHY -->
                     <div class="tab-pane fade" id="tab-typography">
                         <h6>Section Typography</h6>
-                        <div class="mb-3">
-                            <label>Text Color</label>
-                            <input type="color" class="form-control form-control-color w-100" name="typography[color]"
-                                value="<?php echo $adv['typography']['color'] ?? ''; ?>">
-                            <div class="form-text">Leave empty/black to inherit global theme.</div>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Text Color</label>
+                                <input type="color" class="form-control form-control-color w-100"
+                                    name="typography[color]" value="<?php echo $adv['typography']['color'] ?? ''; ?>">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Alignment</label>
+                                <select class="form-select" name="typography[align]">
+                                    <option value="left" <?php echo ($adv['typography']['align'] ?? '') == 'left' ? 'selected' : ''; ?>>Left</option>
+                                    <option value="center" <?php echo ($adv['typography']['align'] ?? '') == 'center' ? 'selected' : ''; ?>>Center</option>
+                                    <option value="right" <?php echo ($adv['typography']['align'] ?? '') == 'right' ? 'selected' : ''; ?>>Right</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Font Family</label>
+                                <select class="form-select" name="typography[font_family]">
+                                    <option value="inherit" <?php echo ($adv['typography']['font_family'] ?? '') == 'inherit' ? 'selected' : ''; ?>>Inherit</option>
+                                    <option value="'Inter', sans-serif" <?php echo ($adv['typography']['font_family'] ?? '') == "'Inter', sans-serif" ? 'selected' : ''; ?>>Inter</option>
+                                    <option value="'Playfair Display', serif" <?php echo ($adv['typography']['font_family'] ?? '') == "'Playfair Display', serif" ? 'selected' : ''; ?>>Playfair Display</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Font Size</label>
+                                <input type="text" class="form-control" name="typography[font_size]"
+                                    value="<?php echo $adv['typography']['font_size'] ?? ''; ?>"
+                                    placeholder="e.g. 16px">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Font Weight</label>
+                                <select class="form-select" name="typography[font_weight]">
+                                    <option value="" <?php echo ($adv['typography']['font_weight'] ?? '') == '' ? 'selected' : ''; ?>>Default</option>
+                                    <option value="300" <?php echo ($adv['typography']['font_weight'] ?? '') == '300' ? 'selected' : ''; ?>>Light (300)</option>
+                                    <option value="400" <?php echo ($adv['typography']['font_weight'] ?? '') == '400' ? 'selected' : ''; ?>>Normal (400)</option>
+                                    <option value="700" <?php echo ($adv['typography']['font_weight'] ?? '') == '700' ? 'selected' : ''; ?>>Bold (700)</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label>Text Align</label>
-                            <select class="form-select" name="typography[align]">
-                                <option value="left" <?php echo ($adv['typography']['align'] ?? '') == 'left' ? 'selected' : ''; ?>>Left</option>
-                                <option value="center" <?php echo ($adv['typography']['align'] ?? '') == 'center' ? 'selected' : ''; ?>>Center</option>
-                                <option value="right" <?php echo ($adv['typography']['align'] ?? '') == 'right' ? 'selected' : ''; ?>>Right</option>
-                            </select>
-                        </div>
+                        <div class="form-text mt-2">These settings apply to all text in this section unless overridden
+                            by individual elements.</div>
                     </div>
                 </div>
                 <div class="modal-footer bg-light">

@@ -22,6 +22,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $prefillPackage = isset($_GET['package']) ? "I am interested in booking: " . htmlspecialchars($_GET['package']) : '';
 ?>
 
+<!-- Builder Sections (Top) -->
+<?php
+if (isset($page['id'])) {
+    require_once 'classes/PageBuilder.php';
+    $stmt = $pdo->prepare("SELECT * FROM sections WHERE page_id = ? AND display_order < 0 ORDER BY display_order ASC");
+    $stmt->execute([$page['id']]);
+    while ($sect = $stmt->fetch()) {
+        PageBuilder::renderSection($sect, $pdo);
+    }
+}
+?>
+
 <div class="container py-5">
     <h1 class="text-center section-title">Contact Us</h1>
 
@@ -71,3 +83,14 @@ $prefillPackage = isset($_GET['package']) ? "I am interested in booking: " . htm
         </div>
     </div>
 </div>
+
+<!-- Builder Sections (Bottom) -->
+<?php
+if (isset($page['id'])) {
+    $stmt = $pdo->prepare("SELECT * FROM sections WHERE page_id = ? AND display_order >= 0 ORDER BY display_order ASC");
+    $stmt->execute([$page['id']]);
+    while ($sect = $stmt->fetch()) {
+        PageBuilder::renderSection($sect, $pdo);
+    }
+}
+?>

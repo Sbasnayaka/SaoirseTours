@@ -201,6 +201,18 @@ class PageBuilder
                     $v = str_replace("watch?v=", "embed/", $v);
                 echo "<div class='ratio ratio-16x9' style='max-width:" . ($s['width'] ?? '100%') . ";margin:0 auto;$style'><iframe src='$v' allowfullscreen></iframe></div>";
                 break;
+            case 'map':
+                // Simple responsive wrapper for Map
+                echo "<div class='map-wrapper' style='width:100%; height:" . ($s['height'] ?? '400px') . "; $style overflow:hidden;'>";
+                // Force width/height 100% on iframe if present
+                $m = $content;
+                if (strpos($m, '<iframe') !== false) {
+                    $m = preg_replace('/width="[^"]+"/', 'width="100%"', $m);
+                    $m = preg_replace('/height="[^"]+"/', 'height="100%"', $m);
+                }
+                echo $m;
+                echo "</div>";
+                break;
             case 'card':
                 echo "<div class='card h-100 shadow-sm' style='$style'>";
                 if (!empty($s['card_image']))
