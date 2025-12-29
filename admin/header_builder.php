@@ -72,6 +72,17 @@ $success = "";
 
 // Handle Save
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Fetch existing settings to preserve 'navigation' block
+    $preserveNav = [];
+    try {
+        $currRow = $pdo->query("SELECT settings FROM header_settings WHERE id = 1")->fetch();
+        if ($currRow && !empty($currRow['settings'])) {
+            $currArr = json_decode($currRow['settings'], true);
+            $preserveNav = $currArr['navigation'] ?? [];
+        }
+    } catch (Exception $e) {
+    }
+
     $settings = [
         'general' => [
             'layout' => $_POST['layout'] ?? 'logo_left',
@@ -103,33 +114,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'bottom_color' => $_POST['border_color'] ?? '#e0e0e0'
             ]
         ],
-        // Tab C: Advanced Menu Styler
-        'navigation' => [
-            'typography' => [
-                'font_family' => $_POST['nav_font_family'] ?? 'inherit',
-                'font_weight' => $_POST['nav_font_weight'] ?? '500',
-                'text_transform' => $_POST['nav_text_transform'] ?? 'none',
-                'font_size' => $_POST['nav_font_size'] ?? '16',
-                'item_spacing' => $_POST['nav_item_spacing'] ?? '15'
-            ],
-            'colors' => [
-                'link_color' => $_POST['nav_link_color'] ?? '#333333',
-                'link_hover_color' => $_POST['nav_hover_color'] ?? '#486856',
-                'link_active_color' => $_POST['nav_active_color'] ?? '#486856',
-                'dropdown_bg' => $_POST['nav_dd_bg'] ?? '#ffffff'
-            ],
-            'hover_effect' => [
-                'style' => $_POST['nav_hover_style'] ?? 'none'
-            ],
-            'dropdown' => [
-                'width' => $_POST['nav_dd_width'] ?? '220',
-                'dividers' => isset($_POST['nav_dd_dividers']) ? 1 : 0
-            ],
-            'mobile' => [
-                'toggle_icon' => $_POST['nav_mobile_icon'] ?? 'bi-list',
-                'link_color' => $_POST['nav_mobile_link_color'] ?? '#333333'
-            ]
-        ]
+
+        // PRESERVE NAVIGATION SETTINGS (Managed in menus.php now)
+        'navigation' => $preserveNav
     ];
 
     $json = json_encode($settings);
@@ -196,10 +183,7 @@ try {
                                 <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-design"
                                     type="button">Design & Style</button>
                             </li>
-                            <li class="nav-item">
-                                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-menu-style"
-                                    type="button"><i class="bi bi-star"></i> Menu Styler</button>
-                            </li>
+
                         </ul>
                     </div>
                     <div class="card-body">
@@ -315,132 +299,6 @@ try {
                                 </div>
                             </div>
 
-                            <!-- TAB C: MENU STYLER -->
-                            <div class="tab-pane fade" id="tab-menu-style">
-                                <!-- A. Typography & Spacing -->
-                                <h5 class="mb-3 text-primary"><i class="bi bi-fonts"></i> Typography & Spacing</h5>
-                                <div class="row g-3 mb-4">
-                                    <div class="col-md-4">
-                                        <label class="form-label">Font Family</label>
-                                        <select class="form-select" name="nav_font_family">
-                                            <option value="inherit" <?php echo val($s, ['navigation', 'typography', 'font_family']) == 'inherit' ? 'selected' : ''; ?>>Inherit (Theme)
-                                            </option>
-                                            <option value="'Inter', sans-serif" <?php echo val($s, ['navigation', 'typography', 'font_family']) == "'Inter', sans-serif" ? 'selected' : ''; ?>>Inter (Modern)</option>
-                                            <option value="'Roboto', sans-serif" <?php echo val($s, ['navigation', 'typography', 'font_family']) == "'Roboto', sans-serif" ? 'selected' : ''; ?>>Roboto</option>
-                                            <option value="'Playfair Display', serif" <?php echo val($s, ['navigation', 'typography', 'font_family']) == "'Playfair Display', serif" ? 'selected' : ''; ?>>Playfair Display (Serif)</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label">Weight</label>
-                                        <select class="form-select" name="nav_font_weight">
-                                            <option value="400" <?php echo val($s, ['navigation', 'typography', 'font_weight']) == '400' ? 'selected' : ''; ?>>Normal (400)</option>
-                                            <option value="500" <?php echo val($s, ['navigation', 'typography', 'font_weight']) == '500' ? 'selected' : ''; ?>>Medium (500)</option>
-                                            <option value="600" <?php echo val($s, ['navigation', 'typography', 'font_weight']) == '600' ? 'selected' : ''; ?>>SemiBold (600)</option>
-                                            <option value="700" <?php echo val($s, ['navigation', 'typography', 'font_weight']) == '700' ? 'selected' : ''; ?>>Bold (700)</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label">Transform</label>
-                                        <select class="form-select" name="nav_text_transform">
-                                            <option value="none" <?php echo val($s, ['navigation', 'typography', 'text_transform']) == 'none' ? 'selected' : ''; ?>>None</option>
-                                            <option value="uppercase" <?php echo val($s, ['navigation', 'typography', 'text_transform']) == 'uppercase' ? 'selected' : ''; ?>>UPPERCASE</option>
-                                            <option value="capitalize" <?php echo val($s, ['navigation', 'typography', 'text_transform']) == 'capitalize' ? 'selected' : ''; ?>>Capitalize
-                                            </option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label">Size (px)</label>
-                                        <input type="number" class="form-control" name="nav_font_size"
-                                            value="<?php echo val($s, ['navigation', 'typography', 'font_size'], '16'); ?>">
-                                    </div>
-                                    <div class="col-md-2">
-                                        <label class="form-label">Spacing (px)</label>
-                                        <input type="number" class="form-control" name="nav_item_spacing"
-                                            value="<?php echo val($s, ['navigation', 'typography', 'item_spacing'], '15'); ?>"
-                                            title="Left/Right Padding">
-                                    </div>
-                                </div>
-
-                                <hr>
-
-                                <!-- B. Interaction & Colors -->
-                                <h5 class="mb-3 text-primary"><i class="bi bi-mouse"></i> Interaction & Colors</h5>
-                                <div class="row g-3 mb-4">
-                                    <div class="col-md-3">
-                                        <label class="form-label">Link Color</label>
-                                        <input type="color" class="form-control form-control-color w-100"
-                                            name="nav_link_color"
-                                            value="<?php echo val($s, ['navigation', 'colors', 'link_color'], '#333333'); ?>">
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Hover Color</label>
-                                        <input type="color" class="form-control form-control-color w-100"
-                                            name="nav_hover_color"
-                                            value="<?php echo val($s, ['navigation', 'colors', 'link_hover_color'], '#486856'); ?>">
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Active Color</label>
-                                        <input type="color" class="form-control form-control-color w-100"
-                                            name="nav_active_color"
-                                            value="<?php echo val($s, ['navigation', 'colors', 'link_active_color'], '#486856'); ?>">
-                                    </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Hover Effect</label>
-                                        <select class="form-select" name="nav_hover_style">
-                                            <option value="none" <?php echo val($s, ['navigation', 'hover_effect', 'style']) == 'none' ? 'selected' : ''; ?>>None (Color Only)</option>
-                                            <option value="underline" <?php echo val($s, ['navigation', 'hover_effect', 'style']) == 'underline' ? 'selected' : ''; ?>>Underline</option>
-                                            <option value="overline" <?php echo val($s, ['navigation', 'hover_effect', 'style']) == 'overline' ? 'selected' : ''; ?>>Overline</option>
-                                            <option value="framed" <?php echo val($s, ['navigation', 'hover_effect', 'style']) == 'framed' ? 'selected' : ''; ?>>Framed Box</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <hr>
-
-                                <div class="row">
-                                    <!-- C. Dropdown Styling -->
-                                    <div class="col-md-6 border-end">
-                                        <h5 class="mb-3 text-primary"><i class="bi bi-menu-button"></i> Dropdown Menu
-                                        </h5>
-                                        <div class="mb-3">
-                                            <label class="form-label">Background Color</label>
-                                            <input type="color" class="form-control form-control-color w-100"
-                                                name="nav_dd_bg"
-                                                value="<?php echo val($s, ['navigation', 'colors', 'dropdown_bg'], '#ffffff'); ?>">
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Dropdown Width (px)</label>
-                                            <input type="number" class="form-control" name="nav_dd_width"
-                                                value="<?php echo val($s, ['navigation', 'dropdown', 'width'], '220'); ?>">
-                                        </div>
-                                        <div class="form-check form-switch">
-                                            <input class="form-check-input" type="checkbox" name="nav_dd_dividers" <?php echo val($s, ['navigation', 'dropdown', 'dividers']) ? 'checked' : ''; ?>>
-                                            <label class="form-check-label">Show Divider Lines</label>
-                                        </div>
-                                    </div>
-
-                                    <!-- D. Mobile Menu -->
-                                    <div class="col-md-6 ps-4">
-                                        <h5 class="mb-3 text-primary"><i class="bi bi-phone"></i> Mobile Menu</h5>
-                                        <div class="mb-3">
-                                            <label class="form-label">Toggle Icon</label>
-                                            <select class="form-select" name="nav_mobile_icon">
-                                                <option value="bi-list" <?php echo val($s, ['navigation', 'mobile', 'toggle_icon']) == 'bi-list' ? 'selected' : ''; ?>>Bars (Standard)
-                                                </option>
-                                                <option value="bi-grid" <?php echo val($s, ['navigation', 'mobile', 'toggle_icon']) == 'bi-grid' ? 'selected' : ''; ?>>Grid</option>
-                                                <option value="bi-three-dots" <?php echo val($s, ['navigation', 'mobile', 'toggle_icon']) == 'bi-three-dots' ? 'selected' : ''; ?>>
-                                                    Dots</option>
-                                            </select>
-                                        </div>
-                                        <div class="mb-3">
-                                            <label class="form-label">Mobile Link Color</label>
-                                            <input type="color" class="form-control form-control-color w-100"
-                                                name="nav_mobile_link_color"
-                                                value="<?php echo val($s, ['navigation', 'mobile', 'link_color'], '#333333'); ?>">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                     <div class="card-footer text-end">

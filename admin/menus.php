@@ -169,7 +169,19 @@ if (isset($_POST['save_menu'])) {
     }
 }
 
+// Helper for array access
+if (!function_exists('val')) {
+    function val($arr, $keys, $default = '') {
+        foreach ($keys as $k) {
+            if (!isset($arr[$k])) return $default;
+            $arr = $arr[$k];
+        }
+        return $arr;
+    }
+}
+
 // 4. FETCH DATA
+// ... (Existing Fetch Logic for Items) ...
 // Get all items for Parents Dropdown and Rendering
 $menuItems = $pdo->query("SELECT * FROM menu_items WHERE menu_id = 1 ORDER BY order_index ASC")->fetchAll(PDO::FETCH_ASSOC);
 
@@ -179,13 +191,62 @@ $pages = $pdo->query("SELECT id, title FROM pages ORDER BY title ASC")->fetchAll
 // Get Available Packages
 $packages = $pdo->query("SELECT id, title FROM packages ORDER BY title ASC")->fetchAll(PDO::FETCH_ASSOC);
 
+// FETCH HEADER SETTINGS (For Styles)
+try {
+    $curr = $pdo->query("SELECT settings FROM header_settings WHERE id = 1")->fetch();
+    $s = $curr && !empty($curr['settings']) ? json_decode($curr['settings'], true) : [];
+} catch (PDOException $e) { $s = []; }
+
+// D. Save Menu Styles
+if (isset($_POST['save_style'])) {
+    // Merge new nav settings into existing settings
+    $s['navigation'] = [
+        'typography' => [
+            'font_family' => $_POST['nav_font_family'] ?? 'inherit',
+            'font_weight' => $_POST['nav_font_weight'] ?? '500',
+            'text_transform' => $_POST['nav_text_transform'] ?? 'none',
+            'font_size' => $_POST['nav_font_size'] ?? '16',
+            'item_spacing' => $_POST['nav_item_spacing'] ?? '15'
+        ],
+        'colors' => [
+            'link_color' => $_POST['nav_link_color'] ?? '#333333',
+            'link_hover_color' => $_POST['nav_hover_color'] ?? '#486856',
+            'link_active_color' => $_POST['nav_active_color'] ?? '#486856',
+            'dropdown_bg' => $_POST['nav_dd_bg'] ?? '#ffffff'
+        ],
+        'hover_effect' => [
+            'style' => $_POST['nav_hover_style'] ?? 'none'
+        ],
+        'dropdown' => [
+            'width' => $_POST['nav_dd_width'] ?? '220',
+            'dividers' => isset($_POST['nav_dd_dividers']) ? 1 : 0
+        ],
+        'mobile' => [
+            'toggle_icon' => $_POST['nav_mobile_icon'] ?? 'bi-list',
+            'link_color' => $_POST['nav_mobile_link_color'] ?? '#333333'
+        ]
+    ];
+    
+    $json = json_encode($s);
+    // Upsert
+    $existing = $pdo->query("SELECT id FROM header_settings WHERE id = 1")->fetch();
+    if ($existing) {
+        $stmt = $pdo->prepare("UPDATE header_settings SET settings = ? WHERE id = 1");
+        $stmt->execute([$json]);
+    } else {
+        $stmt = $pdo->prepare("INSERT INTO header_settings (id, settings) VALUES (1, ?)");
+        $stmt->execute([$json]);
+    }
+    $success = "Menu styles saved successfully!";
+}
+
 ?>
 
 <?php include 'includes/header.php'; ?>
 
 <div class="container-fluid py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Navbar Structure Manager</h1>
+        <h1 class="h3 mb-0 text-gray-800">Menu Manager</h1>
         <a href="../home" target="_blank" class="btn btn-outline-primary"><i class="bi bi-eye"></i> View Site</a>
     </div>
 
@@ -194,7 +255,7 @@ $packages = $pdo->query("SELECT id, title FROM packages ORDER BY title ASC")->fe
     <?php endif; ?>
 
     <div class="row">
-        <!-- LEFT COL: Sources -->
+        <!-- LEFT COL: Sources (Only Visible on Structure Tab really, but ok to keep side-by-side) -->
         <div class="col-lg-4">
             <!-- 1. Custom Links -->
             <div class="card shadow mb-4">
@@ -266,87 +327,212 @@ $packages = $pdo->query("SELECT id, title FROM packages ORDER BY title ASC")->fe
             </div>
         </div>
 
-        <!-- RIGHT COL: Structure -->
+        <!-- RIGHT COL: Structure & Design Tabs -->
         <div class="col-lg-8">
-            <form method="POST">
-                <div class="card shadow mb-4">
-                    <div class="card-header py-3 bg-primary text-white d-flex justify-content-between align-items-center">
-                        <h6 class="m-0 font-weight-bold">Menu Structure (Main Menu)</h6>
-                        <button type="submit" name="save_menu" class="btn btn-light btn-sm fw-bold">Save Menu</button>
-                    </div>
-                    <div class="card-body bg-light">
-                        <?php if (empty($menuItems)): ?>
-                            <p class="text-center text-muted py-4">No items yet. Add some from the left!</p>
-                        <?php else: ?>
-                            <div id="menu-list">
-                                <?php foreach ($menuItems as $item): ?>
-                                <div class="card mb-3 menu-item-card border-left-primary shadow-sm">
-                                    <div class="card-body p-3">
-                                        <div class="d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#itemConfig<?php echo $item['id']; ?>" style="cursor:pointer;">
-                                            <div>
-                                                <strong><?php echo htmlspecialchars($item['title']); ?></strong>
-                                                <small class="text-muted ms-2 badge bg-secondary"><?php echo ucfirst($item['type']); ?></small>
-                                                <?php if(!$item['is_active']): ?>
-                                                    <span class="badge bg-warning text-dark">Hidden</span>
-                                                <?php endif; ?>
-                                                <?php if($item['parent_id'] != 0): ?>
-                                                    <span class="badge bg-info text-dark">Sub Item</span>
-                                                <?php endif; ?>
-                                            </div>
-                                            <i class="bi bi-chevron-down"></i>
-                                        </div>
-                                        
-                                        <!-- Configuration Area -->
-                                        <div id="itemConfig<?php echo $item['id']; ?>" class="collapse mt-3 border-top pt-3">
-                                            <input type="hidden" name="items[<?php echo $item['id']; ?>][id]" value="<?php echo $item['id']; ?>">
-                                            
-                                            <div class="row g-3">
-                                                <div class="col-md-6">
-                                                    <label class="form-label small fw-bold">Navigation Label</label>
-                                                    <input type="text" class="form-control form-control-sm" name="items[<?php echo $item['id']; ?>][title]" value="<?php echo htmlspecialchars($item['title']); ?>">
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <label class="form-label small fw-bold">URL</label>
-                                                    <input type="text" class="form-control form-control-sm" name="items[<?php echo $item['id']; ?>][url]" value="<?php echo htmlspecialchars($item['url']); ?>">
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <label class="form-label small fw-bold">Parent Item</label>
-                                                    <select class="form-select form-select-sm" name="items[<?php echo $item['id']; ?>][parent_id]">
-                                                        <option value="0">-- No Parent (Top Level) --</option>
-                                                        <?php foreach ($menuItems as $parent): ?>
-                                                            <?php if ($parent['id'] != $item['id']): // Prevent self-parenting ?>
-                                                                <option value="<?php echo $parent['id']; ?>" <?php echo $item['parent_id'] == $parent['id'] ? 'selected' : ''; ?>>
-                                                                    <?php echo htmlspecialchars($parent['title']); ?>
-                                                                </option>
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <ul class="nav nav-tabs card-header-tabs" id="menuTabs" role="tablist">
+                        <li class="nav-item">
+                            <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-structure">Structure</button>
+                        </li>
+                        <li class="nav-item">
+                            <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-design"><i class="bi bi-palette"></i> Menu Styler</button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content">
+                        <!-- TAB 1: STRUCTURE -->
+                        <div class="tab-pane fade show active" id="tab-structure">
+                            <form method="POST">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="m-0 font-weight-bold text-secondary">Drag and drop reordering is not active. Use numbers.</h6>
+                                    <button type="submit" name="save_menu" class="btn btn-primary btn-sm fw-bold">Save Structure</button>
+                                </div>
+                                <div class="bg-light p-3 border rounded">
+                                    <?php if (empty($menuItems)): ?>
+                                        <p class="text-center text-muted py-4">No items yet. Add some from the left!</p>
+                                    <?php else: ?>
+                                        <div id="menu-list">
+                                            <?php foreach ($menuItems as $item): ?>
+                                            <div class="card mb-3 menu-item-card border-left-primary shadow-sm">
+                                                <div class="card-body p-3">
+                                                    <div class="d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#itemConfig<?php echo $item['id']; ?>" style="cursor:pointer;">
+                                                        <div>
+                                                            <strong><?php echo htmlspecialchars($item['title']); ?></strong>
+                                                            <small class="text-muted ms-2 badge bg-secondary"><?php echo ucfirst($item['type']); ?></small>
+                                                            <?php if(!$item['is_active']): ?>
+                                                                <span class="badge bg-warning text-dark">Hidden</span>
                                                             <?php endif; ?>
-                                                        <?php endforeach; ?>
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <label class="form-label small fw-bold">Order (1=First)</label>
-                                                    <input type="number" class="form-control form-control-sm" name="items[<?php echo $item['id']; ?>][order]" value="<?php echo $item['order_index']; ?>">
-                                                </div>
-                                                <div class="col-md-4 pt-4">
-                                                     <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" name="items[<?php echo $item['id']; ?>][hide_link]" id="hide<?php echo $item['id']; ?>" <?php echo !$item['is_active'] ? 'checked' : ''; ?>>
-                                                        <label class="form-check-label small" for="hide<?php echo $item['id']; ?>">Hide Link</label>
+                                                            <?php if($item['parent_id'] != 0): ?>
+                                                                <span class="badge bg-info text-dark">Sub Item</span>
+                                                            <?php endif; ?>
+                                                        </div>
+                                                        <i class="bi bi-chevron-down"></i>
+                                                    </div>
+                                                    
+                                                    <!-- Configuration Area -->
+                                                    <div id="itemConfig<?php echo $item['id']; ?>" class="collapse mt-3 border-top pt-3">
+                                                        <input type="hidden" name="items[<?php echo $item['id']; ?>][id]" value="<?php echo $item['id']; ?>">
+                                                        
+                                                        <div class="row g-3">
+                                                            <div class="col-md-6">
+                                                                <label class="form-label small fw-bold">Navigation Label</label>
+                                                                <input type="text" class="form-control form-control-sm" name="items[<?php echo $item['id']; ?>][title]" value="<?php echo htmlspecialchars($item['title']); ?>">
+                                                            </div>
+                                                            <div class="col-md-6">
+                                                                <label class="form-label small fw-bold">URL</label>
+                                                                <input type="text" class="form-control form-control-sm" name="items[<?php echo $item['id']; ?>][url]" value="<?php echo htmlspecialchars($item['url']); ?>">
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <label class="form-label small fw-bold">Parent Item</label>
+                                                                <select class="form-select form-select-sm" name="items[<?php echo $item['id']; ?>][parent_id]">
+                                                                    <option value="0">-- No Parent (Top Level) --</option>
+                                                                    <?php foreach ($menuItems as $parent): ?>
+                                                                        <?php if ($parent['id'] != $item['id']): // Prevent self-parenting ?>
+                                                                            <option value="<?php echo $parent['id']; ?>" <?php echo $item['parent_id'] == $parent['id'] ? 'selected' : ''; ?>>
+                                                                                <?php echo htmlspecialchars($parent['title']); ?>
+                                                                            </option>
+                                                                        <?php endif; ?>
+                                                                    <?php endforeach; ?>
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-md-4">
+                                                                <label class="form-label small fw-bold">Order (1=First)</label>
+                                                                <input type="number" class="form-control form-control-sm" name="items[<?php echo $item['id']; ?>][order]" value="<?php echo $item['order_index']; ?>">
+                                                            </div>
+                                                            <div class="col-md-4 pt-4">
+                                                                 <div class="form-check">
+                                                                    <input class="form-check-input" type="checkbox" name="items[<?php echo $item['id']; ?>][hide_link]" id="hide<?php echo $item['id']; ?>" <?php echo !$item['is_active'] ? 'checked' : ''; ?>>
+                                                                    <label class="form-check-label small" for="hide<?php echo $item['id']; ?>">Hide Link</label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="mt-3 text-end"> 
+                                                            <a href="?delete=<?php echo $item['id']; ?>" class="text-danger small text-decoration-none" onclick="return confirm('Remove this link?');">Remove</a>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="mt-3 text-end"> 
-                                                <a href="?delete=<?php echo $item['id']; ?>" class="text-danger small text-decoration-none" onclick="return confirm('Remove this link?');">Remove</a>
-                                            </div>
+                                            <?php endforeach; ?>
                                         </div>
+                                    <?php endif; ?>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- TAB 2: MENU STYLER -->
+                        <div class="tab-pane fade" id="tab-design">
+                             <form method="POST">
+                                <!-- A. Typography & Spacing -->
+                                <h5 class="mb-3 text-primary"><i class="bi bi-fonts"></i> Typography & Spacing</h5>
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-4">
+                                        <label class="form-label">Font Family</label>
+                                        <select class="form-select" name="nav_font_family">
+                                            <option value="inherit" <?php echo val($s, ['navigation', 'typography', 'font_family']) == 'inherit' ? 'selected' : ''; ?>>Inherit (Theme)</option>
+                                            <option value="'Inter', sans-serif" <?php echo val($s, ['navigation', 'typography', 'font_family']) == "'Inter', sans-serif" ? 'selected' : ''; ?>>Inter (Modern)</option>
+                                            <option value="'Roboto', sans-serif" <?php echo val($s, ['navigation', 'typography', 'font_family']) == "'Roboto', sans-serif" ? 'selected' : ''; ?>>Roboto</option>
+                                            <option value="'Playfair Display', serif" <?php echo val($s, ['navigation', 'typography', 'font_family']) == "'Playfair Display', serif" ? 'selected' : ''; ?>>Playfair Display (Serif)</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Weight</label>
+                                        <select class="form-select" name="nav_font_weight">
+                                            <option value="400" <?php echo val($s, ['navigation', 'typography', 'font_weight']) == '400' ? 'selected' : ''; ?>>Normal (400)</option>
+                                            <option value="500" <?php echo val($s, ['navigation', 'typography', 'font_weight']) == '500' ? 'selected' : ''; ?>>Medium (500)</option>
+                                            <option value="600" <?php echo val($s, ['navigation', 'typography', 'font_weight']) == '600' ? 'selected' : ''; ?>>SemiBold (600)</option>
+                                            <option value="700" <?php echo val($s, ['navigation', 'typography', 'font_weight']) == '700' ? 'selected' : ''; ?>>Bold (700)</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Transform</label>
+                                        <select class="form-select" name="nav_text_transform">
+                                            <option value="none" <?php echo val($s, ['navigation', 'typography', 'text_transform']) == 'none' ? 'selected' : ''; ?>>None</option>
+                                            <option value="uppercase" <?php echo val($s, ['navigation', 'typography', 'text_transform']) == 'uppercase' ? 'selected' : ''; ?>>UPPERCASE</option>
+                                            <option value="capitalize" <?php echo val($s, ['navigation', 'typography', 'text_transform']) == 'capitalize' ? 'selected' : ''; ?>>Capitalize</option>
+                                        </select>
+                                    </div>
+                                     <div class="col-md-2">
+                                        <label class="form-label">Size (px)</label>
+                                        <input type="number" class="form-control" name="nav_font_size" value="<?php echo val($s, ['navigation', 'typography', 'font_size'], '16'); ?>">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Spacing (px)</label>
+                                        <input type="number" class="form-control" name="nav_item_spacing" value="<?php echo val($s, ['navigation', 'typography', 'item_spacing'], '15'); ?>" title="Left/Right Padding">
                                     </div>
                                 </div>
-                                <?php endforeach; ?>
-                            </div>
-                        <?php endif; ?>
+
+                                <hr>
+
+                                <!-- B. Interaction & Colors -->
+                                <h5 class="mb-3 text-primary"><i class="bi bi-mouse"></i> Interaction & Colors</h5>
+                                <div class="row g-3 mb-4">
+                                     <div class="col-md-3">
+                                        <label class="form-label">Link Color</label>
+                                        <input type="color" class="form-control form-control-color w-100" name="nav_link_color" value="<?php echo val($s, ['navigation', 'colors', 'link_color'], '#333333'); ?>">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Hover Color</label>
+                                        <input type="color" class="form-control form-control-color w-100" name="nav_hover_color" value="<?php echo val($s, ['navigation', 'colors', 'link_hover_color'], '#486856'); ?>">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Active Color</label>
+                                        <input type="color" class="form-control form-control-color w-100" name="nav_active_color" value="<?php echo val($s, ['navigation', 'colors', 'link_active_color'], '#486856'); ?>">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Hover Effect</label>
+                                        <select class="form-select" name="nav_hover_style">
+                                            <option value="none" <?php echo val($s, ['navigation', 'hover_effect', 'style']) == 'none' ? 'selected' : ''; ?>>None (Color Only)</option>
+                                            <option value="underline" <?php echo val($s, ['navigation', 'hover_effect', 'style']) == 'underline' ? 'selected' : ''; ?>>Underline</option>
+                                            <option value="overline" <?php echo val($s, ['navigation', 'hover_effect', 'style']) == 'overline' ? 'selected' : ''; ?>>Overline</option>
+                                            <option value="framed" <?php echo val($s, ['navigation', 'hover_effect', 'style']) == 'framed' ? 'selected' : ''; ?>>Framed Box</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <hr>
+                                
+                                <div class="row">
+                                    <!-- C. Dropdown Styling -->
+                                    <div class="col-md-6 border-end">
+                                         <h5 class="mb-3 text-primary"><i class="bi bi-menu-button"></i> Dropdown Menu</h5>
+                                         <div class="mb-3">
+                                            <label class="form-label">Background Color</label>
+                                            <input type="color" class="form-control form-control-color w-100" name="nav_dd_bg" value="<?php echo val($s, ['navigation', 'colors', 'dropdown_bg'], '#ffffff'); ?>">
+                                         </div>
+                                         <div class="mb-3">
+                                            <label class="form-label">Dropdown Width (px)</label>
+                                            <input type="number" class="form-control" name="nav_dd_width" value="<?php echo val($s, ['navigation', 'dropdown', 'width'], '220'); ?>">
+                                         </div>
+                                          <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" name="nav_dd_dividers" <?php echo val($s, ['navigation', 'dropdown', 'dividers']) ? 'checked' : ''; ?>>
+                                            <label class="form-check-label">Show Divider Lines</label>
+                                        </div>
+                                    </div>
+
+                                    <!-- D. Mobile Menu -->
+                                    <div class="col-md-6 ps-4">
+                                         <h5 class="mb-3 text-primary"><i class="bi bi-phone"></i> Mobile Menu</h5>
+                                         <div class="mb-3">
+                                            <label class="form-label">Toggle Icon</label>
+                                            <select class="form-select" name="nav_mobile_icon">
+                                                <option value="bi-list" <?php echo val($s, ['navigation', 'mobile', 'toggle_icon']) == 'bi-list' ? 'selected' : ''; ?>>Bars (Standard)</option>
+                                                <option value="bi-grid" <?php echo val($s, ['navigation', 'mobile', 'toggle_icon']) == 'bi-grid' ? 'selected' : ''; ?>>Grid</option>
+                                                <option value="bi-three-dots" <?php echo val($s, ['navigation', 'mobile', 'toggle_icon']) == 'bi-three-dots' ? 'selected' : ''; ?>>Dots</option>
+                                            </select>
+                                         </div>
+                                         <div class="mb-3">
+                                            <label class="form-label">Mobile Link Color</label>
+                                            <input type="color" class="form-control form-control-color w-100" name="nav_mobile_link_color" value="<?php echo val($s, ['navigation', 'mobile', 'link_color'], '#333333'); ?>">
+                                         </div>
+                                    </div>
+                                </div>
+                                <div class="mt-4 text-end">
+                                    <button type="submit" name="save_style" class="btn btn-primary fw-bold px-4">Save Style</button>
+                                </div>
+                             </form>
+                        </div>
                     </div>
                 </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<?php include 'includes/footer.php'; ?>
+            </div>
