@@ -536,3 +536,8 @@ if (isset($_POST['save_style'])) {
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<?php include 'includes/footer.php'; ?>
