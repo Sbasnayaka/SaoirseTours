@@ -54,8 +54,21 @@ class HeaderRenderer
         echo "<div class='" . ($s['general']['container'] ?? 'container') . "'>";
 
         // Toggle Button (Mobile)
-        echo '<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
-                <span class="navbar-toggler-icon"></span>
+        // Icon Logic
+        $n = $s['navigation'] ?? [];
+        $toggleIconClass = $n['mobile']['toggle_icon'] ?? 'bi-list';
+        $mobLinkColor = $n['mobile']['link_color'] ?? '#333';
+        // Map standard 'navbar-toggler-icon' behaviour if strictly 'bi-list', 
+        // OR render the BI icon directly if it's something custom like dots/grid.
+
+        $iconHtml = '<span class="navbar-toggler-icon"></span>'; // Default
+        if ($toggleIconClass !== 'bi-list') {
+            // Custom Icon
+            $iconHtml = "<i class='$toggleIconClass' style='font-size: 1.5rem; color: $mobLinkColor;'></i>";
+        }
+
+        echo '<button class="navbar-toggler border-0 p-0" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                ' . $iconHtml . '
               </button>';
 
         // LOGO LOGIC (Dynamic)
@@ -71,14 +84,85 @@ class HeaderRenderer
         }
 
         // MENU ITEMS
-        $menuInfo = '<ul class="navbar-nav gap-3">
-                        <li class="nav-item"><a class="nav-link" href="home">Home</a></li>
-                        <li class="nav-item"><a class="nav-link" href="about">About Us</a></li>
-                        <li class="nav-item"><a class="nav-link" href="packages">Packages</a></li>
-                        <li class="nav-item"><a class="nav-link" href="services">Services</a></li>
-                        <li class="nav-item"><a class="nav-link" href="gallery">Gallery</a></li>
-                        <li class="nav-item"><a class="nav-link btn-book px-4 text-white" href="contact">Book Now</a></li>
-                    </ul>';
+        // MENU ITEMS (Dynamic)
+        $menuTree = [];
+        try {
+            // Check if table exists first/fetch directly
+            $stmt = $this->pdo->query("SELECT * FROM menu_items WHERE menu_id = 1 AND is_active = 1 ORDER BY order_index ASC");
+            if ($stmt) {
+                $allItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                // Build Tree
+                $itemsById = [];
+                foreach ($allItems as $item) {
+                    $item['children'] = [];
+                    $itemsById[$item['id']] = $item;
+                }
+                foreach ($itemsById as $id => $item) {
+                    if ($item['parent_id'] == 0) {
+                        $menuTree[$id] = &$itemsById[$id];
+                    } else {
+                        if (isset($itemsById[$item['parent_id']])) {
+                            $itemsById[$item['parent_id']]['children'][] = &$itemsById[$id];
+                        }
+                    }
+                }
+            }
+        } catch (Exception $e) { /* ignore */
+        }
+
+        // Determine active class helper
+        $currPage = basename($_SERVER['PHP_SELF'], '.php');
+
+        // Start Buffering Menu HTML
+        ob_start();
+        echo '<ul class="navbar-nav gap-3">';
+
+        if (empty($menuTree)) {
+            // Fallback Defaults
+            echo '<li class="nav-item"><a class="nav-link" href="home">Home</a></li>';
+            echo '<li class="nav-item"><a class="nav-link" href="about">About Us</a></li>';
+            echo '<li class="nav-item"><a class="nav-link" href="packages">Packages</a></li>';
+            echo '<li class="nav-item"><a class="nav-link" href="contact">Book Now</a></li>';
+        } else {
+            foreach ($menuTree as $item) {
+                $hasChildren = !empty($item['children']);
+                $isActive = ($currPage == $item['url']) ? 'active' : '';
+                // Resolve URL (handle external vs internal)
+                $url = $item['url'];
+
+                if ($hasChildren) {
+                    echo '<li class="nav-item dropdown">';
+                    echo '<a class="nav-link dropdown-toggle ' . $isActive . '" href="#" role="button" data-bs-toggle="dropdown">' . htmlspecialchars($item['title']) . '</a>';
+                    echo '<ul class="dropdown-menu">';
+                    foreach ($item['children'] as $child) {
+                        echo '<li><a class="dropdown-item" href="' . htmlspecialchars($child['url']) . '">' . htmlspecialchars($child['title']) . '</a></li>';
+                    }
+                    echo '</ul>';
+                    echo '</li>';
+                } else {
+                    echo '<li class="nav-item">';
+                    echo '<a class="nav-link ' . $isActive . '" href="' . htmlspecialchars($url) . '">' . htmlspecialchars($item['title']) . '</a>';
+                    echo '</li>';
+                }
+            }
+        }
+        echo '</ul>';
+        $menuInfo = ob_get_clean();
+
+        // Append Book Btn if not present in menu? 
+        // User might want it separate. The hardcoded one had it. 
+        // Let's inject it via JS or separate logic? No, let's append it to the UL if it's the standard layout.
+        // Actually, the previous code had it INSIDE the UL.
+        // I will append it manually for now to ensure CTA exists, or rely on user adding it.
+        // Better: Add it to the $menuInfo output before closing UL if the user wants strict control.
+        // BUT, the prompt implies "Manager" controls links.
+        // I'll leave the "Book Now" as a hardcoded append for safety, or user can add it as a Custom Link?
+        // Let's just append it to the buffer if it's not "logo_center" mode maybe?
+        // Simpler: Just append it inside the UL in the buffer above.
+        // Re-opening buffer logic...
+
+        // Inject CTA Button via string replacement to be safe/easy
+        $menuInfo = str_replace('</ul>', '<li class="nav-item"><a class="nav-link btn-book px-4 text-white" href="contact">Book Now</a></li></ul>', $menuInfo);
 
         // LAYOUT LOGIC
         if ($layout === 'logo_center') {
@@ -107,15 +191,40 @@ class HeaderRenderer
     {
         $s = $this->settings;
         $d = $s['design'];
+        $n = $s['navigation'] ?? [];
         $r = $s['rows']['main_header'] ?? [];
 
+        // --- 1. General Config ---
         $bgColor = $r['bg_color'] ?? '#ffffff';
-        $menuColor = $d['typography']['menu_color'] ?? '#333';
-        $menuHover = $d['typography']['menu_hover'] ?? '#000';
-        $logoColor = $d['typography']['logo_color'] ?? '#000'; // Still used for fallback text
         $height = $r['height'] ?? '80px';
         $bottomBorder = $d['borders']['bottom_width'] ?? '0px';
         $borderColor = $d['borders']['bottom_color'] ?? '#eee';
+        $logoColor = $d['typography']['logo_color'] ?? '#000'; // Fallback text color
+
+        // --- 2. Advanced Navigation Config ---
+        // Typography
+        $navFontFamily = !empty($n['typography']['font_family']) && $n['typography']['font_family'] !== 'inherit' ? $n['typography']['font_family'] : 'var(--font-primary)';
+        $navWeight = $n['typography']['font_weight'] ?? '500';
+        $navTransform = $n['typography']['text_transform'] ?? 'none';
+        $navSize = ($n['typography']['font_size'] ?? '16') . 'px';
+        $navSpacing = ($n['typography']['item_spacing'] ?? '15') . 'px';
+
+        // Colors
+        $linkColor = $n['colors']['link_color'] ?? ($d['typography']['menu_color'] ?? '#333');
+        $linkHover = $n['colors']['link_hover_color'] ?? ($d['typography']['menu_hover'] ?? '#000');
+        $linkActive = $n['colors']['link_active_color'] ?? $linkHover;
+
+        // Dropdown
+        $ddBg = $n['colors']['dropdown_bg'] ?? '#ffffff';
+        $ddWidth = ($n['dropdown']['width'] ?? '220') . 'px';
+        $ddDivider = !empty($n['dropdown']['dividers']) ? '1px solid rgba(0,0,0,0.1)' : 'none';
+
+        // Hover Effect
+        $hoverStyle = $n['hover_effect']['style'] ?? 'none';
+
+        // Mobile
+        $mobLinkColor = $n['mobile']['link_color'] ?? '#333';
+
 
         echo "<style>
             .main-navigation {
@@ -124,41 +233,126 @@ class HeaderRenderer
                 border-bottom: $bottomBorder solid $borderColor;
                 transition: all 0.3s ease;
             }
+            
+            /* Logo */
             .navbar-brand {
                 color: $logoColor !important;
                 font-size: 1.5rem;
                 display: flex;
                 align-items: center;
             }
-            .navbar-brand img {
-                transition: transform 0.3s;
+            .navbar-brand img { transition: transform 0.3s; }
+            .navbar-brand:hover img { transform: scale(1.05); }
+            
+            /* --- NAVIGATION LINKS --- */
+            .navbar-nav .nav-link {
+                color: $linkColor !important;
+                font-family: $navFontFamily;
+                font-weight: $navWeight;
+                text-transform: $navTransform;
+                font-size: $navSize;
+                padding-left: $navSpacing !important;
+                padding-right: $navSpacing !important;
+                position: relative;
+                transition: color 0.3s ease;
             }
-            .navbar-brand:hover img {
-                transform: scale(1.05);
+
+            .navbar-nav .nav-link:hover {
+                color: $linkHover !important;
             }
-            .nav-link {
-                color: $menuColor !important;
-                font-weight: 500;
-                transition: color 0.2s;
+            .navbar-nav .nav-link.active {
+                color: $linkActive !important;
             }
-            .nav-link:hover, .nav-link.active {
-                color: $menuHover !important;
+
+            /* --- HOVER EFFECTS --- */
+            ";
+
+        // Generate Hover Style CSS
+        if ($hoverStyle === 'underline') {
+            echo "
+            .navbar-nav .nav-link::after {
+                content: ''; position: absolute; bottom: 5px; left: $navSpacing; right: $navSpacing;
+                height: 2px; background-color: $linkHover;
+                transform: scaleX(0); transition: transform 0.3s ease;
             }
+            .navbar-nav .nav-link:hover::after,
+            .navbar-nav .nav-link.active::after { transform: scaleX(1); }
+            ";
+        } elseif ($hoverStyle === 'overline') {
+            echo "
+            .navbar-nav .nav-link::before {
+                content: ''; position: absolute; top: 5px; left: $navSpacing; right: $navSpacing;
+                height: 2px; background-color: $linkHover;
+                transform: scaleX(0); transition: transform 0.3s ease;
+            }
+            .navbar-nav .nav-link:hover::before,
+            .navbar-nav .nav-link.active::before { transform: scaleX(1); }
+            ";
+        } elseif ($hoverStyle === 'framed') {
+            echo "
+            .navbar-nav .nav-link {
+                border: 1px solid transparent;
+                border-radius: 4px;
+            }
+            .navbar-nav .nav-link:hover {
+                border-color: $linkHover;
+                background-color: rgba(0,0,0,0.02);
+            }
+            ";
+        }
+
+        echo "
+            /* --- DROPDOWNS --- */
+            .dropdown-menu {
+                background-color: $ddBg;
+                min-width: $ddWidth;
+                border: none;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                padding: 10px 0;
+                border-radius: 0;
+            }
+            .dropdown-item {
+                color: $linkColor;
+                padding: 8px 20px;
+                border-bottom: $ddDivider;
+                font-size: 0.95em;
+            }
+            .dropdown-item:last-child { border-bottom: none; }
+            .dropdown-item:hover {
+                background-color: rgba(0,0,0,0.03);
+                color: $linkHover;
+                padding-left: 25px; /* Slight slide effect */
+                transition: all 0.2s;
+            }
+
+            /* CTA Button Override (Keep it distinct) */
             .btn-book {
                 background-color: var(--primary-color, #486856) !important;
                 border-radius: 50px;
                 color: #fff !important;
+                padding: 8px 25px !important;
             }
-            .btn-book:hover {
-                opacity: 0.9;
+            .btn-book:hover { opacity: 0.9; color: #fff !important; }
+
+            /* --- MOBILE OVERRIDES --- */
+            @media (max-width: 991px) {
+                .navbar-collapse {
+                    background-color: $ddBg;
+                    padding: 20px;
+                    border-top: 1px solid rgba(0,0,0,0.05);
+                    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+                }
+                .navbar-nav .nav-link {
+                    padding: 10px 0 !important;
+                    color: $mobLinkColor !important;
+                }
             }
-            /* Transparent Override */
+
+            /* Transparent Header Mode */
             .header-transparent .main-navigation {
                 background-color: transparent !important;
                 border-bottom: none;
-                position: absolute;
-                width: 100%;
-                z-index: 1000;
+                position: absolute; width: 100%; z-index: 1000;
             }
         </style>";
     }

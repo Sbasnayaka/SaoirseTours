@@ -221,6 +221,9 @@
                 <li><a href="footer_builder.php"
                         class="<?php echo basename($_SERVER['PHP_SELF']) == 'footer_builder.php' ? 'active' : ''; ?>"><i
                             class="bi bi-layout-three-columns"></i> Footer Builder</a></li>
+                <li><a href="menus.php"
+                        class="<?php echo basename($_SERVER['PHP_SELF']) == 'menus.php' ? 'active' : ''; ?>"><i
+                            class="bi bi-diagram-3"></i> Menu Manager</a></li>
                 <li><a href="settings.php"
                         class="<?php echo basename($_SERVER['PHP_SELF']) == 'settings.php' ? 'active' : ''; ?>"><i
                             class="bi bi-sliders"></i> Site Identity</a></li>
