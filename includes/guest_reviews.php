@@ -17,12 +17,18 @@ if ($reviews):
                     $date = !empty($rev['review_date']) ? date('M d, Y', strtotime($rev['review_date'])) : date('M d, Y', strtotime($rev['created_at']));
                     $imgSrc = !empty($rev['image']) ? 'uploads/' . $rev['image'] : 'https://ui-avatars.com/api/?name=' . urlencode($rev['name']);
                     
+                    // Link Wrapper Logic
+                    $hasLink = !empty($rev['link']);
+                    $tag = $hasLink ? 'a' : 'div';
+                    $href = $hasLink ? 'href="'.htmlspecialchars($rev['link']).'" target="_blank"' : '';
+                    $cursorClass = $hasLink ? 'cursor-pointer' : '';
+
                     // RENDER CARD BASED ON SOURCE
                     if ($rev['source'] == 'google') {
                         // --- GOOGLE STYLE ---
                         ?>
                         <div class="item">
-                            <div class="card border-0 shadow-sm h-100 p-3" style="border-radius: 15px; font-family: 'Roboto', sans-serif;">
+                            <<?php echo $tag; ?> <?php echo $href; ?> class="card border-0 shadow-sm h-100 p-3 text-decoration-none review-card <?php echo $cursorClass; ?>" style="border-radius: 15px; font-family: 'Roboto', sans-serif;">
                                 <div class="d-flex align-items-center mb-2">
                                     <img src="<?php echo $imgSrc; ?>" class="rounded-circle me-3" style="width: 40px; height: 40px;">
                                     <div>
@@ -37,22 +43,21 @@ if ($reviews):
                                     <?php for($i=0; $i<5; $i++) echo '<i class="bi bi-star-fill me-1" style="color: #fb8c00; font-size: 14px;"></i>'; ?>
                                 </div>
                                 <p class="small text-dark mb-0" style="line-height: 1.5;"><?php echo htmlspecialchars(substr($rev['review'], 0, 140)); ?>...</p>
-                            </div>
+                            </<?php echo $tag; ?>>
                         </div>
                         <?php
                     } elseif ($rev['source'] == 'tripadvisor') {
                         // --- TRIPADVISOR STYLE ---
                         ?>
                         <div class="item">
-                            <div class="card border h-100 p-3 bg-white" style="border-radius: 0; border-color: #e0e0e0;">
+                            <<?php echo $tag; ?> <?php echo $href; ?> class="card border h-100 p-3 bg-white text-decoration-none review-card <?php echo $cursorClass; ?>" style="border-radius: 0; border-color: #e0e0e0;">
                                 <div class="d-flex justify-content-between mb-2">
                                      <div class="d-flex">
                                         <?php for($i=0; $i<5; $i++) echo '<i class="bi bi-circle-fill me-1" style="color: #00aa6c; font-size: 14px; border: 1px solid #00aa6c; border-radius: 50%;"></i>'; ?>
                                      </div>
-                                     <!-- Owl Icon Fallback using Text/Badge -->
                                      <span class="badge bg-white text-dark border rounded-pill"><i class="bi bi-eye-fill text-success"></i> TripAdvisor</span>
                                 </div>
-                                <h6 class="fw-bold mb-1" style="font-family: 'Arial', sans-serif; font-size: 16px;">"Excellent Experience"</h6>
+                                <h6 class="fw-bold mb-1 text-dark" style="font-family: 'Arial', sans-serif; font-size: 16px;">"Excellent Experience"</h6>
                                 <p class="small text-dark mb-3" style="font-family: 'Arial', sans-serif;"><?php echo htmlspecialchars(substr($rev['review'], 0, 140)); ?></p>
                                 
                                 <div class="d-flex align-items-center mt-auto border-top pt-2">
@@ -62,7 +67,7 @@ if ($reviews):
                                         <div class="text-muted" style="font-size: 10px;">Reviewed <?php echo $date; ?></div>
                                     </div>
                                 </div>
-                            </div>
+                            </<?php echo $tag; ?>>
                         </div>
                         <?php
                     } else {
@@ -72,12 +77,12 @@ if ($reviews):
                         $color = $isFb ? '#1877f2' : '#dc3545';
                         ?>
                         <div class="item">
-                            <div class="card border-0 shadow-sm h-100 review-card">
+                            <<?php echo $tag; ?> <?php echo $href; ?> class="card border-0 shadow-sm h-100 review-card text-decoration-none <?php echo $cursorClass; ?>">
                                 <div class="card-body p-4">
                                     <div class="d-flex align-items-center mb-3">
                                         <img src="<?php echo $imgSrc; ?>" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
                                         <div>
-                                            <h6 class="mb-0 fw-bold"><?php echo htmlspecialchars($rev['name']); ?></h6>
+                                            <h6 class="mb-0 fw-bold text-dark"><?php echo htmlspecialchars($rev['name']); ?></h6>
                                              <?php if($isFb): ?>
                                                 <small class="text-primary"><i class="bi bi-hand-thumbs-up-fill"></i> Recommended</small>
                                              <?php else: ?>
@@ -91,7 +96,7 @@ if ($reviews):
                                     
                                     <p class="card-text text-muted fst-italic">"<?php echo htmlspecialchars(substr($rev['review'], 0, 120)); ?>..."</p>
                                 </div>
-                            </div>
+                            </<?php echo $tag; ?>>
                         </div>
                         <?php
                     }

@@ -41,7 +41,8 @@ if (isset($page['id'])) {
                         <div class="card-body">
                             <h5 class="card-title"><?php echo htmlspecialchars($pkg['title']); ?></h5>
                             <p class="card-text text-muted">
-                                <?php echo strip_tags(substr($pkg['description'], 0, 100)); ?>...</p>
+                                <?php echo strip_tags(substr($pkg['description'], 0, 100)); ?>...
+                            </p>
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="text-primary fw-bold">$<?php echo $pkg['price']; ?></span>
                                 <span class="badge bg-info text-dark"><?php echo $pkg['duration']; ?></span>
@@ -72,7 +73,8 @@ if (isset($page['id'])) {
                         <i class="bi <?php echo $svc['icon']; ?> service-icon"></i>
                         <h4 class="h5 mt-3"><?php echo htmlspecialchars($svc['title']); ?></h4>
                         <p class="small text-muted">
-                            <?php echo htmlspecialchars(substr(strip_tags($svc['description']), 0, 80)); ?>...</p>
+                            <?php echo htmlspecialchars(substr(strip_tags($svc['description']), 0, 80)); ?>...
+                        </p>
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -80,25 +82,5 @@ if (isset($page['id'])) {
     </div>
 </section>
 
-<!-- Testimonials -->
-<section class="py-5 bg-dark text-white">
-    <div class="container">
-        <h2 class="section-title text-white">Guest Reviews</h2>
-        <div class="row justify-content-center">
-            <?php foreach ($testimonials as $rev): ?>
-                <div class="col-md-4 mb-3">
-                    <div class="card bg-secondary text-white border-0 h-100">
-                        <div class="card-body text-center">
-                            <div class="mb-2 text-warning">
-                                <?php for ($i = 0; $i < $rev['rating']; $i++)
-                                    echo '⭐'; ?>
-                            </div>
-                            <p class="fst-italic">"<?php echo htmlspecialchars(substr($rev['review'], 0, 150)); ?>..."</p>
-                            <h6 class="fw-bold">- <?php echo htmlspecialchars($rev['name']); ?></h6>
-                        </div>
-                    </div>
-                </div>
-            <?php endforeach; ?>
-        </div>
-    </div>
-</section>
+<!-- Guest Reviews Slider (Authentic Platform Style) -->
+<?php include __DIR__ . '/../includes/guest_reviews.php'; ?>
