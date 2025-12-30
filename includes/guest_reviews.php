@@ -14,64 +14,88 @@ if ($reviews):
 
             <div class="owl-carousel owl-theme" id="reviews-slider">
                 <?php foreach ($reviews as $rev):
-                    // Determine Source Icon & Color
-                    $icon = 'bi-chat-quote-fill';
-                    $badgeColor = 'bg-secondary';
-                    $sourceName = 'Review';
-
-                    switch ($rev['source']) {
-                        case 'tripadvisor':
-                            $icon = 'bi-tripadvisor'; // Requires bootstrap-icons > 1.8 or use custom image if needed. BI has no owl, using generic or text.
-                            // Actually BI DOES NOT have tripadvisor. Using a substitute or text badge.
-                            // Let's use a nice badge logic.
-                            $brandHtml = '<span class="badge bg-success"><i class="bi bi-circle-fill"></i> TripAdvisor</span>';
-                            break;
-                        case 'google':
-                            $brandHtml = '<span class="badge bg-white text-dark border"><span class="text-primary">G</span><span class="text-danger">o</span><span class="text-warning">o</span><span class="text-primary">g</span><span class="text-success">l</span><span class="text-danger">e</span></span>';
-                            break;
-                        case 'facebook':
-                            $brandHtml = '<span class="badge bg-primary"><i class="bi bi-facebook"></i> Facebook</span>';
-                            break;
-                        default:
-                            $brandHtml = '<span class="badge bg-info text-dark"><i class="bi bi-star-fill"></i> Direct</span>';
-                    }
-
+                    $date = !empty($rev['review_date']) ? date('M d, Y', strtotime($rev['review_date'])) : date('M d, Y', strtotime($rev['created_at']));
                     $imgSrc = !empty($rev['image']) ? 'uploads/' . $rev['image'] : 'https://ui-avatars.com/api/?name=' . urlencode($rev['name']);
-                    ?>
-                    <div class="item">
-                        <div class="card border-0 shadow-sm h-100 review-card">
-                            <div class="card-body p-4">
-                                <div class="d-flex align-items-center mb-3">
-                                    <img src="<?php echo $imgSrc; ?>" class="rounded-circle me-3"
-                                        style="width: 50px; height: 50px; object-fit: cover;">
+                    
+                    // RENDER CARD BASED ON SOURCE
+                    if ($rev['source'] == 'google') {
+                        // --- GOOGLE STYLE ---
+                        ?>
+                        <div class="item">
+                            <div class="card border-0 shadow-sm h-100 p-3" style="border-radius: 15px; font-family: 'Roboto', sans-serif;">
+                                <div class="d-flex align-items-center mb-2">
+                                    <img src="<?php echo $imgSrc; ?>" class="rounded-circle me-3" style="width: 40px; height: 40px;">
                                     <div>
-                                        <h6 class="mb-0 fw-bold"><?php echo htmlspecialchars($rev['name']); ?></h6>
-                                        <small
-                                            class="text-muted"><?php echo date('M Y', strtotime($rev['created_at'])); ?></small>
+                                        <h6 class="mb-0 fw-bold text-dark" style="font-size: 15px;"><?php echo htmlspecialchars($rev['name']); ?></h6>
+                                        <small class="text-muted" style="font-size: 12px;"><?php echo $date; ?></small>
                                     </div>
                                     <div class="ms-auto">
-                                        <?php echo $brandHtml; ?>
+                                        <img src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg" width="24" alt="Google">
                                     </div>
                                 </div>
-
-                                <div class="mb-3 text-warning small">
-                                    <?php for ($i = 0; $i < $rev['rating']; $i++)
-                                        echo '<i class="bi bi-star-fill"></i>'; ?>
+                                <div class="mb-2 text-warning d-flex">
+                                    <?php for($i=0; $i<5; $i++) echo '<i class="bi bi-star-fill me-1" style="color: #fb8c00; font-size: 14px;"></i>'; ?>
                                 </div>
-
-                                <p class="card-text text-muted fst-italic">
-                                    "<?php echo htmlspecialchars(substr($rev['review'], 0, 120)); ?><?php echo strlen($rev['review']) > 120 ? '...' : ''; ?>"
-                                </p>
-
-                                <?php if (!empty($rev['link'])): ?>
-                                    <a href="<?php echo htmlspecialchars($rev['link']); ?>" target="_blank"
-                                        class="small text-decoration-none fw-bold">Verify Review <i
-                                            class="bi bi-box-arrow-up-right"></i></a>
-                                <?php endif; ?>
+                                <p class="small text-dark mb-0" style="line-height: 1.5;"><?php echo htmlspecialchars(substr($rev['review'], 0, 140)); ?>...</p>
                             </div>
                         </div>
-                    </div>
-                <?php endforeach; ?>
+                        <?php
+                    } elseif ($rev['source'] == 'tripadvisor') {
+                        // --- TRIPADVISOR STYLE ---
+                        ?>
+                        <div class="item">
+                            <div class="card border h-100 p-3 bg-white" style="border-radius: 0; border-color: #e0e0e0;">
+                                <div class="d-flex justify-content-between mb-2">
+                                     <div class="d-flex">
+                                        <?php for($i=0; $i<5; $i++) echo '<i class="bi bi-circle-fill me-1" style="color: #00aa6c; font-size: 14px; border: 1px solid #00aa6c; border-radius: 50%;"></i>'; ?>
+                                     </div>
+                                     <!-- Owl Icon Fallback using Text/Badge -->
+                                     <span class="badge bg-white text-dark border rounded-pill"><i class="bi bi-eye-fill text-success"></i> TripAdvisor</span>
+                                </div>
+                                <h6 class="fw-bold mb-1" style="font-family: 'Arial', sans-serif; font-size: 16px;">"Excellent Experience"</h6>
+                                <p class="small text-dark mb-3" style="font-family: 'Arial', sans-serif;"><?php echo htmlspecialchars(substr($rev['review'], 0, 140)); ?></p>
+                                
+                                <div class="d-flex align-items-center mt-auto border-top pt-2">
+                                    <img src="<?php echo $imgSrc; ?>" class="rounded-circle me-2" style="width: 30px; height: 30px;">
+                                    <div style="line-height: 1.2;">
+                                        <div class="small fw-bold text-dark"><?php echo htmlspecialchars($rev['name']); ?></div>
+                                        <div class="text-muted" style="font-size: 10px;">Reviewed <?php echo $date; ?></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <?php
+                    } else {
+                        // --- GENERIC / FACEBOOK STYLE ---
+                        $isFb = $rev['source'] == 'facebook';
+                        $icon = $isFb ? 'bi-facebook' : 'bi-chat-quote';
+                        $color = $isFb ? '#1877f2' : '#dc3545';
+                        ?>
+                        <div class="item">
+                            <div class="card border-0 shadow-sm h-100 review-card">
+                                <div class="card-body p-4">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <img src="<?php echo $imgSrc; ?>" class="rounded-circle me-3" style="width: 50px; height: 50px; object-fit: cover;">
+                                        <div>
+                                            <h6 class="mb-0 fw-bold"><?php echo htmlspecialchars($rev['name']); ?></h6>
+                                             <?php if($isFb): ?>
+                                                <small class="text-primary"><i class="bi bi-hand-thumbs-up-fill"></i> Recommended</small>
+                                             <?php else: ?>
+                                                <small class="text-muted"><?php echo $date; ?></small>
+                                             <?php endif; ?>
+                                        </div>
+                                        <div class="ms-auto display-6" style="color: <?php echo $color; ?>;">
+                                            <i class="bi <?php echo $icon; ?>"></i>
+                                        </div>
+                                    </div>
+                                    
+                                    <p class="card-text text-muted fst-italic">"<?php echo htmlspecialchars(substr($rev['review'], 0, 120)); ?>..."</p>
+                                </div>
+                            </div>
+                        </div>
+                        <?php
+                    }
+                endforeach; ?>
             </div>
         </div>
     </section>
@@ -81,10 +105,10 @@ if ($reviews):
             $("#reviews-slider").owlCarousel({
                 loop: true,
                 margin: 20,
-                nav: true,
+                nav: false,
                 dots: true,
                 autoplay: true,
-                autoplayTimeout: 5000,
+                autoplayTimeout: 6000,
                 smartSpeed: 800,
                 responsive: {
                     0: { items: 1 },
@@ -94,20 +118,10 @@ if ($reviews):
             });
         });
     </script>
-
+    
     <style>
-        /* Custom Tweaks for Slider */
-        .owl-nav button {
-            font-size: 40px !important;
-            color: var(--color-primary) !important;
-        }
-
-        .review-card {
-            transition: transform 0.3s;
-        }
-
-        .review-card:hover {
-            transform: translateY(-5px);
-        }
+        .owl-dots { margin-top: 20px !important; }
+        .owl-theme .owl-dots .owl-dot span { background: #ccc; }
+        .owl-theme .owl-dots .owl-dot.active span { background: var(--color-primary); }
     </style>
 <?php endif; ?>
