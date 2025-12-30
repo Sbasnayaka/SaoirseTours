@@ -206,7 +206,8 @@ include 'includes/header.php';
                                     placeholder="Tell us your preferences..."></textarea>
                             </div>
 
-                            <button type="submit" class="btn btn-dark w-100 py-3 fw-bold">Request Quote</button>
+                            <button type="submit"
+                                class="btn btn-dark w-100 py-3 fw-bold"><?php echo htmlspecialchars($sidebar['button_text'] ?? 'Request Quote'); ?></button>
                         </form>
                     </div>
                 </div>

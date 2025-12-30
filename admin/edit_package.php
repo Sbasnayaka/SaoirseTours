@@ -241,6 +241,12 @@ include 'includes/header.php';
                                 <?php echo ($sidebar['show_pax'] ?? 0) ? 'checked' : ''; ?>>
                             <label class="form-check-label">Show Pax (Adults/Kids) Count</label>
                         </div>
+                        <div class="mb-3 border-top pt-3">
+                            <label class="form-label">Custom Button Label</label>
+                            <input type="text" class="form-control" name="sidebar_settings[button_text]"
+                                value="<?php echo htmlspecialchars($sidebar['button_text'] ?? 'Request Quote'); ?>"
+                                placeholder="e.g. Request Quote">
+                        </div>
                     </div>
                 </div>
             </div>
