@@ -91,6 +91,10 @@ include 'includes/header.php';
                 <button class="nav-link" id="sidebar-tab" data-bs-toggle="tab" data-bs-target="#sidebar" type="button"
                     role="tab">Booking Form</button>
             </li>
+            <li class="nav-item">
+                <button class="nav-link" id="styling-tab" data-bs-toggle="tab" data-bs-target="#styling" type="button"
+                    role="tab">Styling</button>
+            </li>
         </ul>
 
         <div class="tab-content" id="packageTabContent">
@@ -237,15 +241,97 @@ include 'includes/header.php';
                             <label class="form-check-label">Show Arrival Date</label>
                         </div>
                         <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" name="sidebar_settings[show_country]"
+                                value="1" <?php echo ($sidebar['show_country'] ?? 0) ? 'checked' : ''; ?>>
+                            <label class="form-check-label">Show Country Field</label>
+                        </div>
+                        <div class="form-check form-switch mb-3">
                             <input class="form-check-input" type="checkbox" name="sidebar_settings[show_pax]" value="1"
                                 <?php echo ($sidebar['show_pax'] ?? 0) ? 'checked' : ''; ?>>
                             <label class="form-check-label">Show Pax (Adults/Kids) Count</label>
+                        </div>
+                        <div class="form-check form-switch mb-3">
+                            <input class="form-check-input" type="checkbox" name="sidebar_settings[show_departure]"
+                                value="1" <?php echo ($sidebar['show_departure'] ?? 0) ? 'checked' : ''; ?>>
+                            <label class="form-check-label">Show Departure Date</label>
                         </div>
                         <div class="mb-3 border-top pt-3">
                             <label class="form-label">Custom Button Label</label>
                             <input type="text" class="form-control" name="sidebar_settings[button_text]"
                                 value="<?php echo htmlspecialchars($sidebar['button_text'] ?? 'Request Quote'); ?>"
                                 placeholder="e.g. Request Quote">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. STYLING SETTINGS -->
+            <div class="tab-pane fade" id="styling" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-header bg-light"><strong>Hero Section (Top)</strong></div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-6">
+                                        <label class="form-label small">Background Color</label>
+                                        <input type="color" class="form-control form-control-color w-100"
+                                            name="sidebar_settings[design][hero_bg]"
+                                            value="<?php echo $sidebar['design']['hero_bg'] ?? '#f8f9fa'; ?>">
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label small">Text Color</label>
+                                        <input type="color" class="form-control form-control-color w-100"
+                                            name="sidebar_settings[design][hero_text]"
+                                            value="<?php echo $sidebar['design']['hero_text'] ?? '#212529'; ?>">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card mb-3">
+                            <div class="card-header bg-light"><strong>Sidebar & Tabs</strong></div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-6">
+                                        <label class="form-label small">Sidebar Header BG</label>
+                                        <input type="color" class="form-control form-control-color w-100"
+                                            name="sidebar_settings[design][sidebar_bg]"
+                                            value="<?php echo $sidebar['design']['sidebar_bg'] ?? '#0d6efd'; ?>">
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label small">Active Tab Color</label>
+                                        <input type="color" class="form-control form-control-color w-100"
+                                            name="sidebar_settings[design][tab_color]"
+                                            value="<?php echo $sidebar['design']['tab_color'] ?? '#0d6efd'; ?>">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-header bg-light"><strong>Buttons & Accents</strong></div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-6">
+                                        <label class="form-label small">Primary Button BG</label>
+                                        <input type="color" class="form-control form-control-color w-100"
+                                            name="sidebar_settings[design][btn_bg]"
+                                            value="<?php echo $sidebar['design']['btn_bg'] ?? '#0d6efd'; ?>">
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label small">Button Text Color</label>
+                                        <input type="color" class="form-control form-control-color w-100"
+                                            name="sidebar_settings[design][btn_text]"
+                                            value="<?php echo $sidebar['design']['btn_text'] ?? '#ffffff'; ?>">
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small">Custom CSS (Advanced)</label>
+                                    <textarea class="form-control" name="sidebar_settings[design][custom_css]" rows="4"
+                                        placeholder=".element { color: red; }"><?php echo htmlspecialchars($sidebar['design']['custom_css'] ?? ''); ?></textarea>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

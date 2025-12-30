@@ -22,11 +22,68 @@ $sidebar = json_decode($pkg['sidebar_settings'] ?? '{}', true) ?: [];
 
 // Page Meta
 $page_title = $pkg['title'];
+// Design Settings
+$design = $sidebar['design'] ?? [];
+
 include 'includes/header.php';
 ?>
 
+<style>
+    /* Dynamic Package Styling */
+    .package-hero {
+        background-color:
+            <?php echo $design['hero_bg'] ?? '#f8f9fa'; ?>
+            !important;
+        color:
+            <?php echo $design['hero_text'] ?? '#212529'; ?>
+            !important;
+    }
+
+    .package-hero h1,
+    .package-hero .badge {
+        color: inherit;
+    }
+
+    .sidebar-card .card-header {
+        background-color:
+            <?php echo $design['sidebar_bg'] ?? '#0d6efd'; ?>
+            !important;
+        color: #fff !important;
+    }
+
+    .nav-tabs .nav-link.active {
+        color:
+            <?php echo $design['tab_color'] ?? '#0d6efd'; ?>
+            !important;
+        border-bottom: 3px solid
+            <?php echo $design['tab_color'] ?? '#0d6efd'; ?>
+            !important;
+    }
+
+    .nav-tabs .nav-link {
+        color: #6c757d;
+    }
+
+    .btn-primary-custom,
+    .accordion-button:not(.collapsed) {
+        background-color:
+            <?php echo $design['btn_bg'] ?? '#0d6efd'; ?>
+            !important;
+        color:
+            <?php echo $design['btn_text'] ?? '#ffffff'; ?>
+            !important;
+        border: none;
+    }
+
+    .accordion-button:not(.collapsed)::after {
+        filter: brightness(0) invert(1);
+    }
+
+    <?php echo $design['custom_css'] ?? ''; ?>
+</style>
+
 <!-- Package Header -->
-<div class="bg-light py-5 mb-5">
+<div class="package-hero py-5 mb-5">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-md-8">
@@ -148,7 +205,7 @@ include 'includes/header.php';
         <!-- RIGHT COLUMN (30%) - STICKY SIDEBAR -->
         <div class="col-lg-4">
             <div id="booking-form" class="position-sticky" style="top: 100px; z-index: 10;">
-                <div class="card shadow border-0 rounded-3">
+                <div class="card shadow border-0 rounded-3 sidebar-card">
                     <div class="card-header bg-primary text-white p-4 text-center">
                         <h4 class="mb-0">Book This Tour</h4>
                         <small>Get a custom quote today</small>
@@ -173,6 +230,13 @@ include 'includes/header.php';
                                 </div>
                             <?php endif; ?>
 
+                            <?php if (!empty($sidebar['show_country'])): ?>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">Your Country</label>
+                                    <input type="text" name="country" class="form-control" placeholder="e.g. Australia">
+                                </div>
+                            <?php endif; ?>
+
                             <?php if (!empty($sidebar['show_phone'])): ?>
                                 <div class="mb-3">
                                     <label class="form-label small fw-bold">Phone Number</label>
@@ -184,6 +248,13 @@ include 'includes/header.php';
                                 <div class="mb-3">
                                     <label class="form-label small fw-bold">Arrival Date</label>
                                     <input type="date" name="arrival_date" class="form-control">
+                                </div>
+                            <?php endif; ?>
+
+                            <?php if (!empty($sidebar['show_departure'])): ?>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold">Departure Date</label>
+                                    <input type="date" name="departure_date" class="form-control">
                                 </div>
                             <?php endif; ?>
 
@@ -207,7 +278,7 @@ include 'includes/header.php';
                             </div>
 
                             <button type="submit"
-                                class="btn btn-dark w-100 py-3 fw-bold"><?php echo htmlspecialchars($sidebar['button_text'] ?? 'Request Quote'); ?></button>
+                                class="btn btn-primary-custom w-100 py-3 fw-bold"><?php echo htmlspecialchars($sidebar['button_text'] ?? 'Request Quote'); ?></button>
                         </form>
                     </div>
                 </div>
