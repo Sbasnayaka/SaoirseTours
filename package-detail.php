@@ -211,7 +211,7 @@ include 'includes/header.php';
                         <small>Get a custom quote today</small>
                     </div>
                     <div class="card-body p-4">
-                        <form action="contact.php" method="POST"> <!-- Directing to contact handler -->
+                        <form action="contact" method="POST"> <!-- Directing to contact handler -->
                             <input type="hidden" name="package_interest"
                                 value="<?php echo htmlspecialchars($pkg['title']); ?>">
 
@@ -230,7 +230,7 @@ include 'includes/header.php';
                                 </div>
                             <?php endif; ?>
 
-                            <?php if (!empty($sidebar['show_country'])): ?>
+                            <?php if (($sidebar['show_country'] ?? 1)): /* Default to ON */ ?>
                                 <div class="mb-3">
                                     <label class="form-label small fw-bold">Your Country</label>
                                     <input type="text" name="country" class="form-control" placeholder="e.g. Australia">
@@ -251,7 +251,7 @@ include 'includes/header.php';
                                 </div>
                             <?php endif; ?>
 
-                            <?php if (!empty($sidebar['show_departure'])): ?>
+                            <?php if (($sidebar['show_departure'] ?? 1)): /* Default to ON */ ?>
                                 <div class="mb-3">
                                     <label class="form-label small fw-bold">Departure Date</label>
                                     <input type="date" name="departure_date" class="form-control">

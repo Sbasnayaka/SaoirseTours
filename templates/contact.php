@@ -3,8 +3,30 @@ $msg = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name']);
     $email = trim($_POST['email']);
-    $type = $_POST['type'];
+    $type = $_POST['type'] ?? 'inquiry';
     $message = trim($_POST['message']);
+
+    // Capture Extra booking details
+    $extras = [];
+    if (!empty($_POST['package_interest']))
+        $extras[] = "Package: " . $_POST['package_interest'];
+    if (!empty($_POST['country']))
+        $extras[] = "Country: " . $_POST['country'];
+    if (!empty($_POST['phone']))
+        $extras[] = "Phone: " . $_POST['phone'];
+    if (!empty($_POST['arrival_date']))
+        $extras[] = "Arrival: " . $_POST['arrival_date'];
+    if (!empty($_POST['departure_date']))
+        $extras[] = "Departure: " . $_POST['departure_date'];
+    if (isset($_POST['adults']))
+        $extras[] = "Adults: " . $_POST['adults'];
+    if (isset($_POST['children']))
+        $extras[] = "Children: " . $_POST['children'];
+
+    // Append extras to message
+    if (!empty($extras)) {
+        $message .= "\n\n--- Booking Details ---\n" . implode("\n", $extras);
+    }
 
     // Basic Validation
     if ($name && $email && $message) {
