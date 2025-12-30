@@ -101,6 +101,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ],
             'copyright_text' => $_POST['copyright_text'] ?? '',
             'trust_badges_html' => $_POST['trust_badges_html'] ?? '',
+            'live_chat' => [
+                'tawk_to_code' => $_POST['tawk_to_code'] ?? '',
+                'whatsapp_number' => $_POST['whatsapp_number'] ?? '',
+                'messenger_id' => $_POST['messenger_id'] ?? '',
+                'contact_email' => $_POST['contact_email'] ?? ''
+            ],
             'quick_links' => $qLinks
         ],
         'design' => [
@@ -154,6 +160,8 @@ $s = $curr ? json_decode($curr['settings'], true) : [];
                                     data-bs-target="#tab-widgets" type="button">Widget Content</button></li>
                             <li class="nav-item"><button class="nav-link" data-bs-toggle="tab"
                                     data-bs-target="#tab-design" type="button">Design & Style</button></li>
+                            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab"
+                                    data-bs-target="#tab-chat" type="button">Live Chat & Social</button></li>
                         </ul>
                     </div>
                     <div class="card-body">
@@ -242,6 +250,49 @@ $s = $curr ? json_decode($curr['settings'], true) : [];
                                         <input type="color" class="form-control form-control-color w-100"
                                             name="text_color"
                                             value="<?php echo val($s, ['design', 'text_color'], '#ffffff'); ?>">
+                                    </div>
+
+                                    <!-- LIVE CHAT & SOCIAL TAB -->
+                                    <div class="tab-pane fade" id="tab-chat">
+                                        <div class="alert alert-info py-2 mb-4">
+                                            <i class="bi bi-info-circle"></i> Configure floating widgets for the
+                                            frontend.
+                                        </div>
+
+                                        <div class="mb-4">
+                                            <label class="form-label fw-bold">Tawk.to Chat Widget</label>
+                                            <textarea class="form-control font-monospace" name="tawk_to_code" rows="5"
+                                                placeholder="Paste the Widget Code from tawk.to here..."><?php echo htmlspecialchars(val($s, ['widgets', 'live_chat', 'tawk_to_code'])); ?></textarea>
+                                            <small class="text-muted">This will appear as a chat icon in the
+                                                bottom-right corner.</small>
+                                        </div>
+
+                                        <hr>
+
+                                        <h6 class="fw-bold mb-3">Floating Social Dock (Bottom Left)</h6>
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label">WhatsApp Number</label>
+                                                <input type="text" class="form-control" name="whatsapp_number"
+                                                    placeholder="e.g. 94771234567"
+                                                    value="<?php echo htmlspecialchars(val($s, ['widgets', 'live_chat', 'whatsapp_number'])); ?>">
+                                                <small class="text-muted">Format: CountryCode+Number (No spaces or
+                                                    +)</small>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Messenger Username</label>
+                                                <input type="text" class="form-control" name="messenger_id"
+                                                    placeholder="e.g. FabulousAsiaTours"
+                                                    value="<?php echo htmlspecialchars(val($s, ['widgets', 'live_chat', 'messenger_id'])); ?>">
+                                                <small class="text-muted">Your Facebook Page Username.</small>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <label class="form-label">Quick Contact Email</label>
+                                                <input type="email" class="form-control" name="contact_email"
+                                                    placeholder="e.g. info@saoirsetours.com"
+                                                    value="<?php echo htmlspecialchars(val($s, ['widgets', 'live_chat', 'contact_email'])); ?>">
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label">Heading Color</label>
