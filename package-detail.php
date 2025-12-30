@@ -272,7 +272,7 @@ include 'includes/header.php';
                             <?php endif; ?>
 
                             <div class="mb-3">
-                                <label class="form-label small fw-bold">Message / Questions</label>
+                                <label class="form-label small fw-bold">Special Requests / Message</label>
                                 <textarea name="message" class="form-control" rows="3"
                                     placeholder="Tell us your preferences..."></textarea>
                             </div>
