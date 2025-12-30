@@ -36,6 +36,11 @@ $meta_desc = $page['meta_desc'] ?? $settings['tagline'];
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@700&family=Roboto:wght@300;400;700&family=Lato:wght@300;400;700&family=Open+Sans:wght@300;400;600&display=swap"
         rel="stylesheet">
 
+    <!-- OwlCarousel 2 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css">
+
     <!-- Custom CSS -->
     <link rel="stylesheet" href="<?php echo BASE_URL; ?>css/custom.css">
 
