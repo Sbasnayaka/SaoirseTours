@@ -32,7 +32,9 @@ if (isset($page['id'])) {
                         <div class="card-img-top bg-secondary" style="height: 250px;"></div>
                     <?php endif; ?>
                     <div class="card-body">
-                        <h3 class="h5 card-title"><?php echo htmlspecialchars($pkg['title']); ?></h3>
+                        <h3 class="h5 card-title"><a href="package-detail.php?id=<?php echo $pkg['id']; ?>"
+                                class="text-decoration-none text-dark"><?php echo htmlspecialchars($pkg['title']); ?></a>
+                        </h3>
                         <p class="card-text text-muted"><?php echo strip_tags(substr($pkg['description'], 0, 120)); ?>...
                         </p>
                         <div class="d-flex justify-content-between align-items-center mt-3">
@@ -41,8 +43,8 @@ if (isset($page['id'])) {
                         </div>
                     </div>
                     <div class="card-footer bg-white border-top-0 d-grid">
-                        <a href="contact?package=<?php echo urlencode($pkg['title']); ?>" class="btn btn-primary">Book This
-                            Tour</a>
+                        <a href="package-detail.php?id=<?php echo $pkg['id']; ?>" class="btn btn-outline-primary">View
+                            Details</a>
                     </div>
                 </div>
             </div>
