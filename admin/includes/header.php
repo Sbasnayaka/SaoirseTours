@@ -239,6 +239,9 @@
                 <li><a href="gallery.php"
                         class="<?php echo in_array(basename($_SERVER['PHP_SELF']), ['gallery.php', 'edit_gallery.php']) ? 'active' : ''; ?>"><i
                             class="bi bi-images"></i> Gallery</a></li>
+                <li><a href="bookings.php"
+                        class="<?php echo basename($_SERVER['PHP_SELF']) == 'bookings.php' ? 'active' : ''; ?>"><i
+                            class="bi bi-calendar-check-fill"></i> Tour Bookings</a></li>
                 <li><a href="inquiries.php"
                         class="<?php echo basename($_SERVER['PHP_SELF']) == 'inquiries.php' ? 'active' : ''; ?>"><i
                             class="bi bi-envelope"></i> Inquiries</a></li>
