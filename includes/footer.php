@@ -80,13 +80,19 @@ try {
         .social-dock {
             bottom: 20px;
             left: 15px;
-            gap: 12px;
+            gap: 10px;
         }
 
         .social-icon {
-            width: 48px;
-            height: 48px;
-            font-size: 22px;
+            width:
+                <?php echo intval($iconSize) * 0.8; ?>
+                px;
+            height:
+                <?php echo intval($iconSize) * 0.8; ?>
+                px;
+            font-size:
+                <?php echo intval($iconSize) * 0.35; ?>
+                px;
         }
     }
 </style>

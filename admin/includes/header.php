@@ -245,6 +245,9 @@
                 <li><a href="inquiries.php"
                         class="<?php echo basename($_SERVER['PHP_SELF']) == 'inquiries.php' ? 'active' : ''; ?>"><i
                             class="bi bi-envelope"></i> Inquiries</a></li>
+                <li><a href="floating_widgets.php"
+                        class="<?php echo basename($_SERVER['PHP_SELF']) == 'floating_widgets.php' ? 'active' : ''; ?>"><i
+                            class="bi bi-chat-dots-fill"></i> Floating Widgets</a></li>
                 <li><a href="testimonials.php"
                         class="<?php echo in_array(basename($_SERVER['PHP_SELF']), ['testimonials.php', 'edit_testimonial.php']) ? 'active' : ''; ?>"><i
                             class="bi bi-chat-quote"></i> Testimonials</a></li>
