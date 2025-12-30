@@ -1,11 +1,11 @@
 <?php
-// MIGRATION VIA DB_TEST
+// MIGRATION SCRIPT FORCE EXECUTION (Unique File)
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 require_once 'includes/config.php';
 
-echo "<h1>Starting Migration via db_test.php...</h1>";
+echo "<h1>Starting Migration...</h1>";
 
 try {
     // 1. Add Columns
