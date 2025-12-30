@@ -244,7 +244,7 @@ include 'includes/header.php';
                                 </div>
                             <?php endif; ?>
 
-                            <?php if (!empty($sidebar['show_arrival'])): ?>
+                            <?php if (($sidebar['show_arrival'] ?? 1)): /* Default to ON */ ?>
                                 <div class="mb-3">
                                     <label class="form-label small fw-bold">Arrival Date</label>
                                     <input type="date" name="arrival_date" class="form-control">
@@ -258,7 +258,7 @@ include 'includes/header.php';
                                 </div>
                             <?php endif; ?>
 
-                            <?php if (!empty($sidebar['show_pax'])): ?>
+                            <?php if (($sidebar['show_pax'] ?? 1)): /* Default to ON */ ?>
                                 <div class="row g-2 mb-3">
                                     <div class="col-6">
                                         <label class="form-label small fw-bold">Adults</label>

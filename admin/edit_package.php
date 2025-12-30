@@ -216,50 +216,55 @@ include 'includes/header.php';
             </div>
 
             <!-- 4. BOOKING FORM SETTINGS -->
+            <!-- 4. BOOKING FORM SETTINGS -->
             <div class="tab-pane fade" id="sidebar" role="tabpanel">
-                <div class="card col-md-6">
-                    <div class="card-header bg-light"><strong>Sidebar Form Settings</strong></div>
-                    <div class="card-body">
-                        <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" name="sidebar_settings[show_name]" value="1"
-                                <?php echo ($sidebar['show_name'] ?? 1) ? 'checked' : ''; ?>>
-                            <label class="form-check-label">Show Name Field</label>
-                        </div>
-                        <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" name="sidebar_settings[show_email]"
-                                value="1" <?php echo ($sidebar['show_email'] ?? 1) ? 'checked' : ''; ?>>
-                            <label class="form-check-label">Show Email Field</label>
-                        </div>
-                        <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" name="sidebar_settings[show_phone]"
-                                value="1" <?php echo ($sidebar['show_phone'] ?? 0) ? 'checked' : ''; ?>>
-                            <label class="form-check-label">Show Phone Number</label>
-                        </div>
-                        <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" name="sidebar_settings[show_arrival]"
-                                value="1" <?php echo ($sidebar['show_arrival'] ?? 0) ? 'checked' : ''; ?>>
-                            <label class="form-check-label">Show Arrival Date</label>
-                        </div>
-                        <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" name="sidebar_settings[show_country]"
-                                value="1" <?php echo ($sidebar['show_country'] ?? 0) ? 'checked' : ''; ?>>
-                            <label class="form-check-label">Show Country Field</label>
-                        </div>
-                        <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" name="sidebar_settings[show_pax]" value="1"
-                                <?php echo ($sidebar['show_pax'] ?? 0) ? 'checked' : ''; ?>>
-                            <label class="form-check-label">Show Pax (Adults/Kids) Count</label>
-                        </div>
-                        <div class="form-check form-switch mb-3">
-                            <input class="form-check-input" type="checkbox" name="sidebar_settings[show_departure]"
-                                value="1" <?php echo ($sidebar['show_departure'] ?? 0) ? 'checked' : ''; ?>>
-                            <label class="form-check-label">Show Departure Date</label>
-                        </div>
-                        <div class="mb-3 border-top pt-3">
-                            <label class="form-label">Custom Button Label</label>
-                            <input type="text" class="form-control" name="sidebar_settings[button_text]"
-                                value="<?php echo htmlspecialchars($sidebar['button_text'] ?? 'Request Quote'); ?>"
-                                placeholder="e.g. Request Quote">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header bg-light"><strong>Sidebar Form Settings</strong></div>
+                            <div class="card-body">
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" name="sidebar_settings[show_name]" value="1"
+                                        <?php echo ($sidebar['show_name'] ?? 1) ? 'checked' : ''; ?>>
+                                    <label class="form-check-label">Show Name Field</label>
+                                </div>
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" name="sidebar_settings[show_email]"
+                                        value="1" <?php echo ($sidebar['show_email'] ?? 1) ? 'checked' : ''; ?>>
+                                    <label class="form-check-label">Show Email Field</label>
+                                </div>
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" name="sidebar_settings[show_phone]"
+                                        value="1" <?php echo ($sidebar['show_phone'] ?? 0) ? 'checked' : ''; ?>>
+                                    <label class="form-check-label">Show Phone Number</label>
+                                </div>
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" name="sidebar_settings[show_arrival]"
+                                        value="1" <?php echo ($sidebar['show_arrival'] ?? 1) ? 'checked' : ''; ?>>
+                                    <label class="form-check-label">Show Arrival Date</label>
+                                </div>
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" name="sidebar_settings[show_country]"
+                                        value="1" <?php echo ($sidebar['show_country'] ?? 1) ? 'checked' : ''; ?>>
+                                    <label class="form-check-label">Show Country Field</label>
+                                </div>
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" name="sidebar_settings[show_pax]" value="1"
+                                        <?php echo ($sidebar['show_pax'] ?? 1) ? 'checked' : ''; ?>>
+                                    <label class="form-check-label">Show Pax (Adults/Kids) Count</label>
+                                </div>
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" name="sidebar_settings[show_departure]"
+                                        value="1" <?php echo ($sidebar['show_departure'] ?? 1) ? 'checked' : ''; ?>>
+                                    <label class="form-check-label">Show Departure Date</label>
+                                </div>
+                                <div class="mb-3 border-top pt-3">
+                                    <label class="form-label">Custom Button Label</label>
+                                    <input type="text" class="form-control" name="sidebar_settings[button_text]"
+                                        value="<?php echo htmlspecialchars($sidebar['button_text'] ?? 'Request Quote'); ?>"
+                                        placeholder="e.g. Request Quote">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
