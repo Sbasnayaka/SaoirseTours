@@ -3,6 +3,13 @@ require_once 'includes/config.php';
 
 // Get Page Slug
 $slug = isset($_GET['page']) ? $_GET['page'] : 'home';
+
+// Fix singular 'package' url (should be packages)
+if ($slug === 'package') {
+    header("Location: packages");
+    exit;
+}
+
 if ($slug == '')
     $slug = 'home';
 

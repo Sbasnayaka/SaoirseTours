@@ -131,8 +131,15 @@ class HeaderRenderer
                 $url = $item['url'];
 
                 if ($hasChildren) {
-                    echo '<li class="nav-item dropdown">';
-                    echo '<a class="nav-link dropdown-toggle ' . $isActive . '" href="#" role="button" data-bs-toggle="dropdown">' . htmlspecialchars($item['title']) . '</a>';
+                    echo '<li class="nav-item dropdown d-flex align-items-center">';
+                    // If URL is valid, make text a link and add separate toggle
+                    if ($url && $url !== '#') {
+                        echo '<a class="nav-link ' . $isActive . ' me-1" href="' . htmlspecialchars($url) . '">' . htmlspecialchars($item['title']) . '</a>';
+                        echo '<a class="nav-link dropdown-toggle dropdown-toggle-split px-2" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false"><span class="visually-hidden">Toggle Dropdown</span></a>';
+                    } else {
+                        // Standard Toggle Pair
+                        echo '<a class="nav-link dropdown-toggle ' . $isActive . '" href="#" role="button" data-bs-toggle="dropdown">' . htmlspecialchars($item['title']) . '</a>';
+                    }
                     echo '<ul class="dropdown-menu">';
                     foreach ($item['children'] as $child) {
                         echo '<li><a class="dropdown-item" href="' . htmlspecialchars($child['url']) . '">' . htmlspecialchars($child['title']) . '</a></li>';
