@@ -25,28 +25,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Add/Update/Delete Elements... (Same as before)
     if (isset($_POST['add_element'])) {
         $type = $_POST['type'];
-        $content = 'New Item';
+        
+        // 1. Calculate Next Order
+        $stmtOrder = $pdo->prepare("SELECT MAX(display_order) FROM section_elements WHERE section_id = ?");
+        $stmtOrder->execute([$section_id]);
+        $maxOrder = $stmtOrder->fetchColumn();
+        $newOrder = ($maxOrder !== false) ? $maxOrder + 10 : 10;
+
+        // 2. Define Defaults
+        $content = 'New ' . ucfirst($type);
         $s = ['margin_bottom' => '20px'];
-        if ($type == 'heading') {
-            $content = 'New Heading';
-            $s['tag'] = 'h2';
+        
+        switch ($type) {
+            case 'heading':
+                $content = 'New Heading';
+                $s['tag'] = 'h2'; 
+                $s['color'] = ''; // Inherit by default
+                break;
+            case 'text':
+                $content = '<p>Start writing your content here...</p>'; 
+                break;
+            case 'button':
+                $content = 'Click Here';
+                $s['style'] = 'btn-primary';
+                break;
+            case 'card':
+                $content = 'Card content goes here.';
+                $s['card_title'] = 'Card Title';
+                $s['shadow'] = '1';
+                $s['bg_color'] = '#ffffff';
+                break;
+            case 'spacer':
+                $content = '';
+                $s['height'] = '50px';
+                break;
+            case 'map':
+                $content = '';
+                $s['height'] = '400px';
+                break;
+            case 'image':
+                $content = ''; // Placeholder or require upload
+                break;
+            case 'divider':
+                $content = '';
+                $s['color'] = '#cccccc';
+                break;
         }
-        if ($type == 'text') {
-            $content = '<p>Start writing...</p>';
-        }
-        if ($type == 'button') {
-            $content = 'Click Here';
-            $s['style'] = 'btn-primary';
-        }
-        if ($type == 'spacer') {
-            $content = '';
-            $s['height'] = '50px';
-        }
-        if ($type == 'map') {
-            $content = '';
-            $s['height'] = '400px';
-        }
-        $pdo->prepare("INSERT INTO section_elements (section_id, type, content, settings, display_order) VALUES (?, ?, ?, ?, 99)")->execute([$section_id, $type, $content, json_encode($s)]);
+
+        $pdo->prepare("INSERT INTO section_elements (section_id, type, content, settings, display_order) VALUES (?, ?, ?, ?, ?)")
+            ->execute([$section_id, $type, $content, json_encode($s), $newOrder]);
+            
+        // Add success param to URL for toast (optional, but good for UX)
     }
 
     if (isset($_POST['update_element'])) {
