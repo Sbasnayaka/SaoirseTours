@@ -49,5 +49,4 @@ This project is built on a solid, clean, and modular architecture.
 **Saoirse Tours CMS** represents a bridge between "Simple Dynamic Websites" and "Enterprise Content Management". It demonstrates how complex logic (like a visual builder) can be implemented with clean, efficient code.
 
 **Developed by Sanduni Basnayaka.**
-**Undergraduate – Computer Science & Software Engineering*
-**Web Developer - Asseminate Solutions (Pvt) Ltd*
+*Web Developer - Asseminate Solutions (Pvt) Ltd*
