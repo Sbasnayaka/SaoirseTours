@@ -214,13 +214,30 @@ class PageBuilder
                 echo "</div>";
                 break;
             case 'card':
-                echo "<div class='card h-100 shadow-sm' style='$style'>";
-                if (!empty($s['card_image']))
-                    echo "<img src='uploads/" . htmlspecialchars($s['card_image']) . "' class='card-img-top' style='height:200px;object-fit:cover;'>";
-                echo "<div class='card-body'>";
-                if (!empty($s['card_title']))
-                    echo "<h5 class='card-title'>" . htmlspecialchars($s['card_title']) . "</h5>";
-                echo "<div class='card-text'>$content</div>";
+                $cardBg = $s['bg_color'] ?? '#ffffff';
+                $cardCol = $s['color'] ?? 'inherit';
+                $shadowClass = ($s['shadow'] ?? '0') == '1' ? 'shadow' : 'shadow-sm';
+
+                // Card Wrapper with Hover Effect
+                echo "<div class='card h-100 border-0 $shadowClass' style='background:$cardBg; color:$cardCol; transition: transform 0.3s ease, box-shadow 0.3s ease; overflow:hidden;' onmouseover='this.style.transform=\"translateY(-5px)\"; this.style.boxShadow=\"0 .5rem 1rem rgba(0,0,0,.15)\"' onmouseout='this.style.transform=\"translateY(0)\"; this.style.boxShadow=\"\"'>";
+
+                // Image
+                if (!empty($s['card_image'])) {
+                    echo "<div class='position-relative' style='height: 220px; overflow:hidden;'>";
+                    echo "<img src='uploads/" . htmlspecialchars($s['card_image']) . "' class='card-img-top w-100 h-100' style='object-fit: cover; transition: transform 0.5s ease;' onmouseover='this.style.transform=\"scale(1.05)\"' onmouseout='this.style.transform=\"scale(1)\"'>";
+                    echo "</div>";
+                }
+
+                echo "<div class='card-body' style='padding:" . ($s['padding'] ?? '2rem') . ";'>";
+
+                // Title
+                if (!empty($s['card_title'])) {
+                    echo "<h5 class='card-title fw-bold mb-3' style='color: " . ($s['title_color'] ?? 'inherit') . "'>" . htmlspecialchars($s['card_title']) . "</h5>";
+                }
+
+                // Content
+                echo "<div class='card-text opacity-75'>$content</div>";
+
                 echo "</div></div>";
                 break;
             case 'spacer':

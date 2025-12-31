@@ -263,6 +263,53 @@ include 'includes/header.php';
                                         <input type="text" class="form-control form-control-sm" name="settings[height]"
                                             value="<?php echo $s['height'] ?? '50px'; ?>">
 
+                                    <?php elseif ($el['type'] == 'card'): ?>
+                                        <div class="mb-3">
+                                            <label class="small fw-bold">Card Title</label>
+                                            <input type="text" class="form-control" name="settings[card_title]"
+                                                value="<?php echo htmlspecialchars($s['card_title'] ?? ''); ?>">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="small fw-bold">content</label>
+                                            <textarea class="form-control" name="content"
+                                                rows="3"><?php echo htmlspecialchars($el['content']); ?></textarea>
+                                        </div>
+                                        <div class="mb-3 border p-2 rounded bg-light">
+                                            <label class="small fw-bold">Card Image</label>
+                                            <?php if (!empty($s['card_image'])): ?>
+                                                <div class="mb-2">
+                                                    <img src="../uploads/<?php echo $s['card_image']; ?>"
+                                                        style="height: 100px; object-fit: cover;" class="rounded d-block mb-1">
+                                                    <input type="hidden" name="existing_card_image"
+                                                        value="<?php echo $s['card_image']; ?>">
+                                                    <small class="text-success"><i class="bi bi-check"></i> Image Saved</small>
+                                                </div>
+                                            <?php endif; ?>
+                                            <input type="file" class="form-control form-control-sm" name="card_image">
+                                        </div>
+                                        <div class="row g-2">
+                                            <div class="col-4">
+                                                <label class="small">Bg Color</label>
+                                                <input type="color" class="form-control form-control-color w-100"
+                                                    name="settings[bg_color]"
+                                                    value="<?php echo $s['bg_color'] ?? '#ffffff'; ?>">
+                                            </div>
+                                            <div class="col-4">
+                                                <label class="small">Text Color</label>
+                                                <input type="color" class="form-control form-control-color w-100"
+                                                    name="settings[color]" value="<?php echo $s['color'] ?? '#000000'; ?>">
+                                            </div>
+                                            <div class="col-4">
+                                                <label class="small">Shadow</label>
+                                                <select class="form-select form-select-sm" name="settings[shadow]">
+                                                    <option value="0" <?php echo ($s['shadow'] ?? '0') == '0' ? 'selected' : ''; ?>>Flat
+                                                    </option>
+                                                    <option value="1" <?php echo ($s['shadow'] ?? '0') == '1' ? 'selected' : ''; ?>>
+                                                        Shadow</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
                                     <?php elseif ($el['type'] == 'map'): ?>
                                         <div class="mb-2">
                                             <label class="small fw-bold">Embed Code (iframe)</label>
