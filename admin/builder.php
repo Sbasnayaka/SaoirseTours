@@ -311,295 +311,361 @@ include 'includes/header.php';
     </div>
 </div>
 
-<!-- ADVANCED SETTINGS MODAL -->
+<!-- ADVANCED SETTINGS MODAL (Redesigned) -->
 <div class="modal fade" id="advancedSettingsModalV2" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-    <div class="modal-dialog modal-lg">
-        <form method="POST" class="modal-content" enctype="multipart/form-data">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <form method="POST" class="modal-content border-0 shadow-lg" enctype="multipart/form-data">
             <input type="hidden" name="update_section_advanced" value="1">
-            <div class="modal-header">
-                <h5 class="modal-title">Advanced Section Settings</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title font-weight-bold"><i class="bi bi-sliders me-2"></i> Advanced Section Design</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body p-0">
-                <div class="d-flex align-items-start">
-                    <div class="nav flex-column nav-pills me-3 bg-light h-100 p-3" style="min-width: 200px;"
-                        role="tablist">
-                        <button class="nav-link active text-start" data-bs-toggle="pill" data-bs-target="#tab-layout"
-                            type="button">Layout</button>
-                        <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#tab-bg"
-                            type="button">Background & Overlay</button>
-                        <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#tab-spacing"
-                            type="button">Spacing</button>
-                        <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#tab-border"
-                            type="button">Borders & Dividers</button>
-                        <button class="nav-link text-start" data-bs-toggle="pill" data-bs-target="#tab-typography"
-                            type="button">Typography</button>
-                    </div>
-                    <div class="tab-content w-100 p-3">
+                <!-- HORIZONTAL TABS WITH ICONS -->
+                <ul class="nav nav-tabs nav-justified bg-light border-bottom" role="tablist">
+                    <li class="nav-item">
+                        <button class="nav-link active py-3" data-bs-toggle="tab" data-bs-target="#tab-layout"
+                            type="button">
+                            <i class="bi bi-aspect-ratio fs-5 d-block mb-1"></i> Layout
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link py-3" data-bs-toggle="tab" data-bs-target="#tab-bg" type="button">
+                            <i class="bi bi-image fs-5 d-block mb-1"></i> Background
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link py-3" data-bs-toggle="tab" data-bs-target="#tab-spacing" type="button">
+                            <i class="bi bi-arrows-expand fs-5 d-block mb-1"></i> Spacing
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link py-3" data-bs-toggle="tab" data-bs-target="#tab-border" type="button">
+                            <i class="bi bi-border-outer fs-5 d-block mb-1"></i> Borders
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link py-3" data-bs-toggle="tab" data-bs-target="#tab-typography"
+                            type="button">
+                            <i class="bi bi-fonts fs-5 d-block mb-1"></i> Typography
+                        </button>
+                    </li>
+                </ul>
 
-                        <!-- LAYOUT -->
-                        <div class="tab-pane fade show active" id="tab-layout">
-                            <h6>Layout & Dimensions</h6>
-                            <div class="mb-3">
-                                <label>Container Width</label>
+                <div class="tab-content p-4">
+
+                    <!-- TAB 1: LAYOUT -->
+                    <div class="tab-pane fade show active" id="tab-layout">
+                        <h6 class="text-uppercase text-muted small fw-bold mb-3">Container & Sizing</h6>
+                        <div class="row align-items-center mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Container Width</label>
                                 <select class="form-select" name="layout[width]">
-                                    <option value="boxed" <?php echo ($adv['layout']['width'] ?? '') == 'boxed' ? 'selected' : ''; ?>>Boxed (Default)
-                                    </option>
+                                    <option value="boxed" <?php echo ($adv['layout']['width'] ?? '') == 'boxed' ? 'selected' : ''; ?>>Boxed (Center content)</option>
                                     <option value="full" <?php echo ($adv['layout']['width'] ?? '') == 'full' ? 'selected' : ''; ?>>Full Width (Fluid)</option>
                                 </select>
                             </div>
-                            <div class="mb-3">
-                                <label>Min Height</label>
+                            <div class="col-md-6">
+                                <label class="form-label">Minimum Height</label>
                                 <div class="input-group">
                                     <input type="text" class="form-control" name="layout[min_height]"
-                                        value="<?php echo $adv['layout']['min_height'] ?? 'auto'; ?>">
-                                    <span class="input-group-text text-muted">e.g., 500px, 100vh</span>
+                                        value="<?php echo $adv['layout']['min_height'] ?? 'auto'; ?>"
+                                        placeholder="auto">
+                                    <span class="input-group-text text-muted">px / vh</span>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- BACKGROUND -->
-                        <div class="tab-pane fade" id="tab-bg">
-                            <h6>Background Source</h6>
-                            <div class="mb-3">
-                                <select class="form-select" name="background[type]" onchange="toggleBgType(this.value)">
-                                    <option value="color" <?php echo ($adv['background']['type'] ?? '') == 'color' ? 'selected' : ''; ?>>Solid Color</option>
-                                    <option value="image" <?php echo ($adv['background']['type'] ?? '') == 'image' ? 'selected' : ''; ?>>Image</option>
-                                    <option value="gradient" <?php echo ($adv['background']['type'] ?? '') == 'gradient' ? 'selected' : ''; ?>>Gradient</option>
-                                </select>
+                    <!-- TAB 2: BACKGROUND -->
+                    <div class="tab-pane fade" id="tab-bg">
+                        <h6 class="text-uppercase text-muted small fw-bold mb-3">Background Type</h6>
+
+                        <!-- Visual Selectors -->
+                        <div class="row g-3 mb-4">
+                            <div class="col-4">
+                                <label
+                                    class="card h-100 cursor-pointer border-0 bg-light bg-hover-select text-center p-3">
+                                    <input type="radio" name="background[type]" value="color" class="d-none"
+                                        onchange="toggleBgType(this.value)" <?php echo ($adv['background']['type'] ?? '') == 'color' ? 'checked' : ''; ?>>
+                                    <i class="bi bi-palette fs-2 text-primary mb-2"></i>
+                                    <div class="small fw-bold">Solid Color</div>
+                                </label>
                             </div>
-                            <!-- Color Fields -->
-                            <div class="bg-section-field row g-2" id="bg-color-field">
-                                <div class="col-6">
-                                    <label>Bg Color</label>
-                                    <input type="color" class="form-control form-control-color w-100"
-                                        name="background[color]"
-                                        value="<?php echo $adv['background']['color'] ?? '#ffffff'; ?>">
-                                </div>
-                                <div class="col-6 d-flex align-items-end">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="background[transparent]"
-                                            value="1" <?php echo ($adv['background']['transparent'] ?? 0) == 1 ? 'checked' : ''; ?>>
-                                        <label class="form-check-label">Transparent</label>
+                            <div class="col-4">
+                                <label
+                                    class="card h-100 cursor-pointer border-0 bg-light bg-hover-select text-center p-3">
+                                    <input type="radio" name="background[type]" value="image" class="d-none"
+                                        onchange="toggleBgType(this.value)" <?php echo ($adv['background']['type'] ?? '') == 'image' ? 'checked' : ''; ?>>
+                                    <i class="bi bi-image fs-2 text-success mb-2"></i>
+                                    <div class="small fw-bold">Image</div>
+                                </label>
+                            </div>
+                            <div class="col-4">
+                                <label
+                                    class="card h-100 cursor-pointer border-0 bg-light bg-hover-select text-center p-3">
+                                    <input type="radio" name="background[type]" value="gradient" class="d-none"
+                                        onchange="toggleBgType(this.value)" <?php echo ($adv['background']['type'] ?? '') == 'gradient' ? 'checked' : ''; ?>>
+                                    <i class="bi bi-rainbow fs-2 text-danger mb-2"></i>
+                                    <div class="small fw-bold">Gradient</div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- BG Fields -->
+                        <div class="card bg-light border-0 p-3">
+                            <div class="bg-section-field" id="bg-color-field">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Background Color</label>
+                                        <input type="color" class="form-control form-control-color w-100"
+                                            name="background[color]"
+                                            value="<?php echo $adv['background']['color'] ?? '#ffffff'; ?>">
+                                    </div>
+                                    <div class="col-md-6 pt-4">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox"
+                                                name="background[transparent]" value="1" <?php echo ($adv['background']['transparent'] ?? 0) == 1 ? 'checked' : ''; ?>>
+                                            <label class="form-check-label">Transparent Background</label>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <!-- Image Fields -->
+
                             <div class="bg-section-field d-none" id="bg-image-field">
-                                <label>Bg Image</label>
-                                <input type="file" class="form-control mb-2" name="bg_image">
+                                <label class="form-label">Background Image</label>
+                                <div class="input-group mb-2">
+                                    <input type="file" class="form-control" name="bg_image">
+                                    <?php if ($section['image']): ?>
+                                        <span class="input-group-text bg-white"><i
+                                                class="bi bi-check-circle-fill text-success"></i> Saved</span>
+                                    <?php endif; ?>
+                                </div>
                                 <?php if ($section['image']): ?>
-                                    <div class="small">Current: <?php echo $section['image']; ?></div><?php endif; ?>
+                                    <div class="mb-2"><img src="../uploads/<?php echo $section['image']; ?>" height="60"
+                                            class="rounded"></div>
+                                <?php endif; ?>
                             </div>
-                            <!-- Gradient Fields -->
+
                             <div class="bg-section-field d-none" id="bg-gradient-field">
-                                <label>CSS Gradient</label>
-                                <input type="text" class="form-control" name="background[gradient]"
+                                <label class="form-label">CSS Gradient</label>
+                                <input type="text" class="form-control font-monospace" name="background[gradient]"
                                     value="<?php echo $adv['background']['gradient'] ?? ''; ?>"
-                                    placeholder="linear-gradient(...)">
+                                    placeholder="linear-gradient(to right, #ff0099, #493240)">
                             </div>
+                        </div>
 
-                            <hr>
-                            <h6>Effects & Overlay</h6>
-                            <div class="row g-2 mb-3">
-                                <div class="col-6">
-                                    <label>Overlay Color</label>
-                                    <input type="color" class="form-control form-control-color w-100"
-                                        name="background[overlay_color]"
-                                        value="<?php echo $adv['background']['overlay_color'] ?? '#000000'; ?>">
-                                </div>
-                                <div class="col-6">
-                                    <label>Overlay Opacity (0-1) </label>
-                                    <input type="number" step="0.1" min="0" max="1" class="form-control"
+                        <hr class="my-4">
+                        <div class="row">
+                            <div class="col-6">
+                                <label class="form-label small text-muted text-uppercase">Overlay Color</label>
+                                <input type="color" class="form-control form-control-color w-100"
+                                    name="background[overlay_color]"
+                                    value="<?php echo $adv['background']['overlay_color'] ?? '#000000'; ?>">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label small text-muted text-uppercase">Overlay Opacity</label>
+                                <div class="d-flex align-items-center gap-2">
+                                    <input type="range" class="form-range" min="0" max="1" step="0.1"
                                         name="background[overlay_opacity]"
-                                        value="<?php echo $adv['background']['overlay_opacity'] ?? '0'; ?>">
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label>Blur Effect</label>
-                                <div class="input-group">
-                                    <select class="form-select" name="background[blur_mode]">
-                                        <option value="none" <?php echo ($adv['background']['blur_mode'] ?? '') == 'none' ? 'selected' : ''; ?>>No Blur
-                                        </option>
-                                        <option value="backdrop" <?php echo ($adv['background']['blur_mode'] ?? '') == 'backdrop' ? 'selected' : ''; ?>>Backdrop
-                                            Blur (Glassmorphism)</option>
-                                        <option value="full" <?php echo ($adv['background']['blur_mode'] ?? '') == 'full' ? 'selected' : ''; ?>>Blur Image
-                                        </option>
-                                    </select>
-                                    <input type="text" class="form-control" name="background[blur_px]"
-                                        value="<?php echo $adv['background']['blur_px'] ?? '10px'; ?>"
-                                        placeholder="10px">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- SPACING -->
-                        <div class="tab-pane fade" id="tab-spacing">
-                            <h6>Padding (Inside)</h6>
-                            <div class="row g-2 mb-3">
-                                <div class="col-3"><label class="small">Top</label><input type="text"
-                                        class="form-control" name="spacing[padding_top]"
-                                        value="<?php echo $adv['spacing']['padding_top'] ?? '50px'; ?>"></div>
-                                <div class="col-3"><label class="small">Bottom</label><input type="text"
-                                        class="form-control" name="spacing[padding_bottom]"
-                                        value="<?php echo $adv['spacing']['padding_bottom'] ?? '50px'; ?>"></div>
-                                <div class="col-3"><label class="small">Left</label><input type="text"
-                                        class="form-control" name="spacing[padding_left]"
-                                        value="<?php echo $adv['spacing']['padding_left'] ?? '0px'; ?>"></div>
-                                <div class="col-3"><label class="small">Right</label><input type="text"
-                                        class="form-control" name="spacing[padding_right]"
-                                        value="<?php echo $adv['spacing']['padding_right'] ?? '0px'; ?>"></div>
-                            </div>
-                            <h6>Margin (Outside)</h6>
-                            <div class="row g-2">
-                                <div class="col-6"><label class="small">Top</label><input type="text"
-                                        class="form-control" name="spacing[margin_top]"
-                                        value="<?php echo $adv['spacing']['margin_top'] ?? '0px'; ?>"></div>
-                                <div class="col-6"><label class="small">Bottom</label><input type="text"
-                                        class="form-control" name="spacing[margin_bottom]"
-                                        value="<?php echo $adv['spacing']['margin_bottom'] ?? '0px'; ?>"></div>
-                            </div>
-                        </div>
-
-                        <!-- BORDER & DIVIDERS -->
-                        <div class="tab-pane fade" id="tab-border">
-                            <h6>Borders</h6>
-                            <div class="row g-2 mb-3">
-                                <div class="col-4"><input type="text" class="form-control" name="border[width]"
-                                        value="<?php echo $adv['border']['width'] ?? ''; ?>" placeholder="1px"></div>
-                                <div class="col-4"><select class="form-select" name="border[style]">
-                                        <option value="solid">Solid</option>
-                                        <option value="dashed">Dashed</option>
-                                    </select></div>
-                                <div class="col-4"><input type="color" class="form-control form-control-color w-100"
-                                        name="border[color]"
-                                        value="<?php echo $adv['border']['color'] ?? '#000000'; ?>"></div>
-                            </div>
-                            <div class="mb-3"><label>Radius</label><input type="text" class="form-control"
-                                    name="border[radius]" value="<?php echo $adv['border']['radius'] ?? '0px'; ?>">
-                            </div>
-
-                            <hr>
-                            <h6>Dividers (Scalable Vector Graphics)</h6>
-                            <div class="row g-2">
-                                <div class="col-6">
-                                    <label>Top Divider</label>
-                                    <select class="form-select" name="dividers[top]">
-                                        <option value="none" <?php echo ($adv['dividers']['top'] ?? '') == 'none' ? 'selected' : ''; ?>>None</option>
-                                        <option value="wave" <?php echo ($adv['dividers']['top'] ?? '') == 'wave' ? 'selected' : ''; ?>>Wave</option>
-                                        <option value="slant" <?php echo ($adv['dividers']['top'] ?? '') == 'slant' ? 'selected' : ''; ?>>Slant</option>
-                                    </select>
-                                </div>
-                                <div class="col-6">
-                                    <label>Bottom Divider</label>
-                                    <select class="form-select" name="dividers[bottom]">
-                                        <option value="none" <?php echo ($adv['dividers']['bottom'] ?? '') == 'none' ? 'selected' : ''; ?>>None</option>
-                                        <option value="wave" <?php echo ($adv['dividers']['bottom'] ?? '') == 'wave' ? 'selected' : ''; ?>>Wave</option>
-                                        <option value="slant" <?php echo ($adv['dividers']['bottom'] ?? '') == 'slant' ? 'selected' : ''; ?>>Slant</option>
-                                    </select>
-                                </div>
-                                <div class="col-12 mt-2">
-                                    <label>Divider Color</label>
-                                    <input type="color" class="form-control form-control-color w-100"
-                                        name="dividers[color]"
-                                        value="<?php echo $adv['dividers']['color'] ?? '#ffffff'; ?>">
+                                        value="<?php echo $adv['background']['overlay_opacity'] ?? '0'; ?>"
+                                        oninput="this.nextElementSibling.value = this.value">
+                                    <output><?php echo $adv['background']['overlay_opacity'] ?? '0'; ?></output>
                                 </div>
                             </div>
                         </div>
                     </div>
 
+                    <!-- TAB 3: SPACING (Visual Box Model) -->
+                    <div class="tab-pane fade" id="tab-spacing">
+                        <h6 class="text-center text-uppercase text-muted small fw-bold mb-3">Box Model Spacing</h6>
 
+                        <div class="d-flex justify-content-center">
+                            <div
+                                style="width: 300px; position: relative; padding: 40px; border: 1px dashed #ccc; background: #f8f9fa; border-radius: 8px;">
+                                <div class="text-center text-muted small mb-2 fw-bold">MARGIN (Outside)</div>
 
-                    <!-- ... inside Typography Tab ... -->
-                    <!-- TYPOGRAPHY -->
+                                <!-- Margin Inputs -->
+                                <input type="text" name="spacing[margin_top]"
+                                    class="form-control form-control-sm text-center position-absolute"
+                                    style="top: 5px; left: 50%; transform: translateX(-50%); width: 60px;"
+                                    placeholder="Top" value="<?php echo $adv['spacing']['margin_top'] ?? '0px'; ?>">
+                                <input type="text" name="spacing[margin_bottom]"
+                                    class="form-control form-control-sm text-center position-absolute"
+                                    style="bottom: 5px; left: 50%; transform: translateX(-50%); width: 60px;"
+                                    placeholder="Btm" value="<?php echo $adv['spacing']['margin_bottom'] ?? '0px'; ?>">
+
+                                <!-- PADDING BOX -->
+                                <div class="bg-white border text-center p-4 rounded position-relative"
+                                    style="min-height: 120px;">
+                                    <div class="text-center text-primary small mb-2 fw-bold">PADDING (Inside)</div>
+
+                                    <input type="text" name="spacing[padding_top]"
+                                        class="form-control form-control-sm text-center position-absolute border-primary"
+                                        style="top: 5px; left: 50%; transform: translateX(-50%); width: 60px;"
+                                        placeholder="Top"
+                                        value="<?php echo $adv['spacing']['padding_top'] ?? '50px'; ?>">
+                                    <input type="text" name="spacing[padding_bottom]"
+                                        class="form-control form-control-sm text-center position-absolute border-primary"
+                                        style="bottom: 5px; left: 50%; transform: translateX(-50%); width: 60px;"
+                                        placeholder="Btm"
+                                        value="<?php echo $adv['spacing']['padding_bottom'] ?? '50px'; ?>">
+                                    <input type="text" name="spacing[padding_left]"
+                                        class="form-control form-control-sm text-center position-absolute border-primary"
+                                        style="left: 5px; top: 50%; transform: translateY(-50%); width: 50px;"
+                                        placeholder="L" value="<?php echo $adv['spacing']['padding_left'] ?? '0px'; ?>">
+                                    <input type="text" name="spacing[padding_right]"
+                                        class="form-control form-control-sm text-center position-absolute border-primary"
+                                        style="right: 5px; top: 50%; transform: translateY(-50%); width: 50px;"
+                                        placeholder="R"
+                                        value="<?php echo $adv['spacing']['padding_right'] ?? '0px'; ?>">
+
+                                    <div class="mt-4 text-muted small">CONTENT</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 4: BORDERS -->
+                    <div class="tab-pane fade" id="tab-border">
+                        <div class="row align-items-end mb-4">
+                            <div class="col-md-3">
+                                <label class="form-label">Width</label>
+                                <input type="text" class="form-control" name="border[width]"
+                                    value="<?php echo $adv['border']['width'] ?? ''; ?>" placeholder="0px">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Style</label>
+                                <select class="form-select" name="border[style]">
+                                    <option value="solid">Solid</option>
+                                    <option value="dashed">Dashed</option>
+                                    <option value="dotted">Dotted</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Color</label>
+                                <input type="color" class="form-control form-control-color w-100" name="border[color]"
+                                    value="<?php echo $adv['border']['color'] ?? '#000000'; ?>">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Radius</label>
+                                <input type="text" class="form-control" name="border[radius]"
+                                    value="<?php echo $adv['border']['radius'] ?? '0px'; ?>" placeholder="e.g. 8px">
+                            </div>
+                        </div>
+                        <h6 class="text-uppercase text-muted small fw-bold mb-3">Shape Dividers (SVG)</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Top Shape</label>
+                                <select class="form-select" name="dividers[top]">
+                                    <option value="none">None</option>
+                                    <option value="wave" <?php echo ($adv['dividers']['top'] ?? '') == 'wave' ? 'selected' : ''; ?>>Wave</option>
+                                    <option value="slant" <?php echo ($adv['dividers']['top'] ?? '') == 'slant' ? 'selected' : ''; ?>>Slant</option>
+                                    <option value="curve" <?php echo ($adv['dividers']['top'] ?? '') == 'curve' ? 'selected' : ''; ?>>Curve</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Bottom Shape</label>
+                                <select class="form-select" name="dividers[bottom]">
+                                    <option value="none">None</option>
+                                    <option value="wave" <?php echo ($adv['dividers']['bottom'] ?? '') == 'wave' ? 'selected' : ''; ?>>Wave</option>
+                                    <option value="slant" <?php echo ($adv['dividers']['bottom'] ?? '') == 'slant' ? 'selected' : ''; ?>>Slant</option>
+                                    <option value="curve" <?php echo ($adv['dividers']['bottom'] ?? '') == 'curve' ? 'selected' : ''; ?>>Curve</option>
+                                </select>
+                            </div>
+                            <div class="col-md-12">
+                                <label class="form-label">Shape Color</label>
+                                <input type="color" class="form-control form-control-color w-100" name="dividers[color]"
+                                    value="<?php echo $adv['dividers']['color'] ?? '#ffffff'; ?>">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 5: TYPOGRAPHY -->
                     <div class="tab-pane fade" id="tab-typography">
-                        <h6>Section Typography</h6>
-
-                        <!-- Text Color -->
-                        <div class="mb-3">
-                            <label>Text Color</label>
-                            <input type="color" class="form-control form-control-color w-100" name="typography[color]"
-                                value="<?php echo $adv['typography']['color'] ?? '#000000'; ?>">
-                        </div>
-
-                        <!-- Alignment -->
-                        <div class="mb-3">
-                            <label>Text Alignment</label>
-                            <div class="btn-group w-100" role="group">
-                                <input type="radio" class="btn-check" name="typography[align]" value="left" id="tAlignL"
-                                    <?php echo ($adv['typography']['align'] ?? '') == 'left' ? 'checked' : ''; ?>>
-                                <label class="btn btn-outline-secondary" for="tAlignL"><i class="bi bi-text-left"></i>
-                                    Left</label>
-
-                                <input type="radio" class="btn-check" name="typography[align]" value="center"
-                                    id="tAlignC" <?php echo ($adv['typography']['align'] ?? '') == 'center' ? 'checked' : ''; ?>>
-                                <label class="btn btn-outline-secondary" for="tAlignC"><i class="bi bi-text-center"></i>
-                                    Center</label>
-
-                                <input type="radio" class="btn-check" name="typography[align]" value="right"
-                                    id="tAlignR" <?php echo ($adv['typography']['align'] ?? '') == 'right' ? 'checked' : ''; ?>>
-                                <label class="btn btn-outline-secondary" for="tAlignR"><i class="bi bi-text-right"></i>
-                                    Right</label>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Text Color</label>
+                                <input type="color" class="form-control form-control-color w-100"
+                                    name="typography[color]"
+                                    value="<?php echo $adv['typography']['color'] ?? '#000000'; ?>">
                             </div>
-                        </div>
-
-                        <!-- Font Family -->
-                        <div class="mb-3">
-                            <label>Font Family</label>
-                            <select class="form-select" name="typography[font_family]">
-                                <option value="inherit" <?php echo ($adv['typography']['font_family'] ?? '') == 'inherit' ? 'selected' : ''; ?>>Inherit Global Font</option>
-                                <option value="'Inter', sans-serif" <?php echo ($adv['typography']['font_family'] ?? '') == "'Inter', sans-serif" ? 'selected' : ''; ?>>Inter</option>
-                                <option value="'Playfair Display', serif" <?php echo ($adv['typography']['font_family'] ?? '') == "'Playfair Display', serif" ? 'selected' : ''; ?>>Playfair Display</option>
-                                <option value="'Roboto', sans-serif" <?php echo ($adv['typography']['font_family'] ?? '') == "'Roboto', sans-serif" ? 'selected' : ''; ?>>Roboto</option>
-                                <option value="monospace" <?php echo ($adv['typography']['font_family'] ?? '') == "monospace" ? 'selected' : ''; ?>>Monospace</option>
-                            </select>
-                        </div>
-
-                        <!-- Font Size -->
-                        <div class="mb-3">
-                            <label>Font Size</label>
-                            <div class="input-group">
-                                <input type="text" class="form-control" name="typography[font_size]"
-                                    value="<?php echo $adv['typography']['font_size'] ?? ''; ?>" placeholder="e.g. 16">
-                                <span class="input-group-text">px</span>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Alignment</label>
+                                <div class="btn-group w-100" role="group">
+                                    <input type="radio" class="btn-check" name="typography[align]" value="left"
+                                        id="tAlignL" <?php echo ($adv['typography']['align'] ?? '') == 'left' ? 'checked' : ''; ?>>
+                                    <label class="btn btn-outline-secondary" for="tAlignL"><i
+                                            class="bi bi-text-left"></i></label>
+                                    <input type="radio" class="btn-check" name="typography[align]" value="center"
+                                        id="tAlignC" <?php echo ($adv['typography']['align'] ?? '') == 'center' ? 'checked' : ''; ?>>
+                                    <label class="btn btn-outline-secondary" for="tAlignC"><i
+                                            class="bi bi-text-center"></i></label>
+                                    <input type="radio" class="btn-check" name="typography[align]" value="right"
+                                        id="tAlignR" <?php echo ($adv['typography']['align'] ?? '') == 'right' ? 'checked' : ''; ?>>
+                                    <label class="btn btn-outline-secondary" for="tAlignR"><i
+                                            class="bi bi-text-right"></i></label>
+                                </div>
                             </div>
-                        </div>
-
-                        <!-- Font Weight -->
-                        <div class="mb-3">
-                            <label>Font Weight</label>
-                            <select class="form-select" name="typography[font_weight]">
-                                <option value="" <?php echo ($adv['typography']['font_weight'] ?? '') == '' ? 'selected' : ''; ?>>Default</option>
-                                <option value="300" <?php echo ($adv['typography']['font_weight'] ?? '') == '300' ? 'selected' : ''; ?>>Light (300)</option>
-                                <option value="400" <?php echo ($adv['typography']['font_weight'] ?? '') == '400' ? 'selected' : ''; ?>>Normal (400)</option>
-                                <option value="600" <?php echo ($adv['typography']['font_weight'] ?? '') == '600' ? 'selected' : ''; ?>>Semi-Bold (600)</option>
-                                <option value="700" <?php echo ($adv['typography']['font_weight'] ?? '') == '700' ? 'selected' : ''; ?>>Bold (700)</option>
-                            </select>
-                        </div>
-
-                        <div class="alert alert-light py-2 small border mb-0">
-                            <i class="bi bi-info-circle"></i> Applies to all text in this section.
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Font Family</label>
+                                <select class="form-select" name="typography[font_family]">
+                                    <option value="inherit">Inherit Global Font</option>
+                                    <option value="'Inter', sans-serif" <?php echo ($adv['typography']['font_family'] ?? '') == "'Inter', sans-serif" ? 'selected' : ''; ?>>Inter</option>
+                                    <option value="'Playfair Display', serif" <?php echo ($adv['typography']['font_family'] ?? '') == "'Playfair Display', serif" ? 'selected' : ''; ?>>Playfair Display</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Font Weight</label>
+                                <select class="form-select" name="typography[font_weight]">
+                                    <option value="">Default</option>
+                                    <option value="300" <?php echo ($adv['typography']['font_weight'] ?? '') == '300' ? 'selected' : ''; ?>>Light</option>
+                                    <option value="400" <?php echo ($adv['typography']['font_weight'] ?? '') == '400' ? 'selected' : ''; ?>>Normal</option>
+                                    <option value="700" <?php echo ($adv['typography']['font_weight'] ?? '') == '700' ? 'selected' : ''; ?>>Bold</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer bg-light">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Advanced Settings</button>
-                </div>
+            </div>
+
+            <div class="modal-footer bg-light">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary px-4">Save Changes</button>
+            </div>
         </form>
     </div>
 </div>
 
 <script>
     if (typeof CKEDITOR != 'undefined') CKEDITOR.replace('.ckeditor-lite');
+
     function toggleBgType(val) {
-        document.querySelectorAll('.bg-section-field').forEach(el => el.classList.add('d-non e'));
-        if (val === 'color') document.getElementById('bg-color-field').classList.remove('d -non e');
-        if (val === 'image') document.getElementById('bg-image-field').classList.remove('d- non e');
+        // Toggle Active State visuals
+        document.querySelectorAll('input[name="background[type]"]').forEach(input => {
+            // Reset container style
+            input.parentElement.classList.remove('border-primary', 'bg-white', 'shadow-sm');
+            input.parentElement.classList.add('bg-light', 'border-0');
+        });
+
+        // Highlight active
+        const activeInput = document.querySelector(`input[name="background[type]"][value="${val}"]`);
+        if (activeInput) {
+            activeInput.parentElement.classList.remove('bg-light', 'border-0');
+            activeInput.parentElement.classList.add('border', 'border-primary', 'bg-white', 'shadow-sm');
+        }
+
+        // Show/Hide Fields
+        document.querySelectorAll('.bg-section-field').forEach(el => el.classList.add('d-none'));
+        if (val === 'color') document.getElementById('bg-color-field').classList.remove('d-none');
+        if (val === 'image') document.getElementById('bg-image-field').classList.remove('d-none');
         if (val === 'gradient') document.getElementById('bg-gradient-field').classList.remove('d-none');
     }
-    // Init
-    toggleBgType('<?php echo $adv['background']['type'] ?? ($section['bg_type'] ?? 'color'); ?>');
+
+    // Init state
+    document.addEventListener('DOMContentLoaded', function () {
+        toggleBgType('<?php echo $adv['background']['type'] ?? ($section['bg_type'] ?? 'color'); ?>');
+    });
 </script>
 
 <?php include 'includes/footer.php'; ?>
