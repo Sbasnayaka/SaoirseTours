@@ -168,7 +168,6 @@ class PageBuilder
         echo '</div>';
     }
 
-    // (renderElement method remains same, keeping previous improvements)
     private static function renderElement($el)
     {
         $s = json_decode($el['settings'], true) ?? [];
