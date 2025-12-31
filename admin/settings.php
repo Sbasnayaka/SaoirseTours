@@ -17,24 +17,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $contact_email = $_POST['contact_email'];
 
     // Handle Logo Upload
-    $logoPath = null;
+    $logoPath = $settings['logo'] ?? null;
     if (!empty($_FILES['logo']['name'])) {
         $targetDir = "../uploads/";
-        if (!is_dir($targetDir)) {
-            mkdir($targetDir, 0755, true);
-        }
+        if (!is_dir($targetDir)) mkdir($targetDir, 0755, true);
         $fileName = time() . '_' . basename($_FILES['logo']['name']);
-        $targetFile = $targetDir . $fileName;
-        $imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
-
-        // Validate
-        $check = getimagesize($_FILES['logo']['tmp_name']);
-        if ($check !== false) {
-            if (move_uploaded_file($_FILES['logo']['tmp_name'], $targetFile)) {
-                $logoPath = $fileName;
-            }
+        if (move_uploaded_file($_FILES['logo']['tmp_name'], $targetDir . $fileName)) {
+            $logoPath = $fileName;
         }
     }
+
+    // Handle Favicon Upload
+    $faviconPath = $settings['favicon'] ?? null;
+    if (!empty($_FILES['favicon']['name'])) {
+        $targetDir = "../uploads/";
+        if (!is_dir($targetDir)) mkdir($targetDir, 0755, true);
+        $fileName = 'favicon_' . time() . '_' . basename($_FILES['favicon']['name']);
+        if (move_uploaded_file($_FILES['favicon']['tmp_name'], $targetDir . $fileName)) {
+            $faviconPath = $fileName;
+        }
+    }
+
+    // SYNC WITH THEME ENGINE (JSON)
+    // We must update the JSON because ThemeHelper prioritizes JSON values over flat columns
+    $currentTheme = json_decode($settings['theme_json'] ?? '{}', true);
+    
+    // Update Colors
+    $currentTheme['colors']['primary'] = $primary_color;
+    $currentTheme['colors']['bg_body'] = $bg_color;
+    
+    // Update Fonts
+    $currentTheme['typography']['font_primary'] = $font_family;
+
+    $newThemeJson = json_encode($currentTheme);
 
     // Update Query
     $sql = "UPDATE settings SET 
@@ -43,7 +58,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             bg_color = :bg_color,
             primary_color = :primary_color,
             font_family = :font_family,
-            contact_email = :contact_email";
+            contact_email = :contact_email,
+            logo = :logo,
+            favicon = :favicon,
+            theme_json = :theme_json
+            WHERE id = 1";
 
     $params = [
         ':site_title' => $site_title,
@@ -51,19 +70,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ':bg_color' => $bg_color,
         ':primary_color' => $primary_color,
         ':font_family' => $font_family,
-        ':contact_email' => $contact_email
+        ':contact_email' => $contact_email,
+        ':logo' => $logoPath,
+        ':favicon' => $faviconPath,
+        ':theme_json' => $newThemeJson
     ];
 
-    if ($logoPath) {
-        $sql .= ", logo = :logo";
-        $params[':logo'] = $logoPath;
-    }
-
-    $sql .= " WHERE id = 1";
     $stmt = $pdo->prepare($sql);
 
     if ($stmt->execute($params)) {
-        $message = '<div class="alert alert-success">Settings updated successfully!</div>';
+        $message = '<div class="alert alert-success">Settings & Theme updated successfully!</div>';
+        // Refresh settings for display
+        $stmt = $pdo->query("SELECT * FROM settings WHERE id = 1");
+        $settings = $stmt->fetch();
     } else {
         $message = '<div class="alert alert-danger">Error updating settings.</div>';
     }
@@ -124,15 +143,28 @@ $settings = $stmt->fetch();
                         value="<?php echo htmlspecialchars($settings['contact_email'] ?? ''); ?>">
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label">Website Logo</label>
-                    <?php if (!empty($settings['logo'])): ?>
-                        <div class="mb-2">
-                            <img src="../uploads/<?php echo htmlspecialchars($settings['logo']); ?>" alt="Current Logo"
-                                style="max-height: 100px;">
-                        </div>
-                    <?php endif; ?>
-                    <input type="file" class="form-control" name="logo" accept="image/*">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Website Logo</label>
+                        <?php if (!empty($settings['logo'])): ?>
+                            <div class="mb-2">
+                                <img src="../uploads/<?php echo htmlspecialchars($settings['logo']); ?>" alt="Current Logo"
+                                    style="max-height: 80px;">
+                            </div>
+                        <?php endif; ?>
+                        <input type="file" class="form-control" name="logo" accept="image/*">
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Favicon (Browser Tab Icon)</label>
+                        <?php if (!empty($settings['favicon'])): ?>
+                            <div class="mb-2">
+                                <img src="../uploads/<?php echo htmlspecialchars($settings['favicon']); ?>" alt="Favicon"
+                                    style="width: 32px; height: 32px;">
+                            </div>
+                        <?php endif; ?>
+                        <input type="file" class="form-control" name="favicon" accept="image/*">
+                    </div>
                 </div>
 
                 <button type="submit" class="btn btn-primary">Save Settings</button>
