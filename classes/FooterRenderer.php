@@ -106,8 +106,16 @@ class FooterRenderer
             echo "<a href='{$socials['facebook']}' target='_blank'><i class='bi bi-facebook'></i></a>";
         if (!empty($socials['instagram']))
             echo "<a href='{$socials['instagram']}' target='_blank'><i class='bi bi-instagram'></i></a>";
-        if (!empty($socials['whatsapp']))
-            echo "<a href='{$socials['whatsapp']}' target='_blank'><i class='bi bi-whatsapp'></i></a>";
+        if (!empty($socials['whatsapp'])) {
+            $wa = $socials['whatsapp'];
+            // If it's just a number (doesn't start with http), format it
+            if (strpos($wa, 'http') !== 0) {
+                // Remove non-digits
+                $cleanWa = preg_replace('/[^0-9]/', '', $wa);
+                $wa = "https://wa.me/$cleanWa";
+            }
+            echo "<a href='$wa' target='_blank'><i class='bi bi-whatsapp'></i></a>";
+        }
         if (!empty($socials['tripadvisor_url']))
             echo "<a href='{$socials['tripadvisor_url']}' target='_blank'><i class='bi bi-tripadvisor'></i></a>";
         echo "</div>";

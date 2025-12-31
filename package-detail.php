@@ -214,6 +214,7 @@ include 'includes/header.php';
                         <form action="contact" method="POST"> <!-- Directing to contact handler -->
                             <input type="hidden" name="package_interest"
                                 value="<?php echo htmlspecialchars($pkg['title']); ?>">
+                            <input type="hidden" name="type" value="booking">
 
                             <?php if ($sidebar['show_name'] ?? 1): ?>
                                 <div class="mb-3">

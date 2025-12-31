@@ -4,6 +4,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $name = trim($_POST['name']);
     $email = trim($_POST['email']);
     $type = $_POST['type'] ?? 'inquiry';
+    // Force Booking type if a package is selected
+    if (!empty($_POST['package_interest'])) {
+        $type = 'booking';
+    }
     $message = trim($_POST['message']);
 
     // Capture Extra booking details
