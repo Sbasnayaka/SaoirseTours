@@ -72,15 +72,22 @@ class HeaderRenderer
               </button>';
 
         // LOGO LOGIC (Dynamic)
+        // Check user preference (Default to 'image' if not set)
+        $brandingType = $s['general']['branding_type'] ?? 'image';
+
         $logoHtml = "";
-        if (!empty($g['logo']) && file_exists(__DIR__ . '/../uploads/' . $g['logo'])) {
+
+        if ($brandingType === 'image' && !empty($g['logo']) && file_exists(__DIR__ . '/../uploads/' . $g['logo'])) {
+            // Image Logo
             $logoHtml = "<a class='navbar-brand' href='home'>
                             <img src='uploads/{$g['logo']}' alt='Logo' style='max-height: 50px;'>
                           </a>";
         } else {
-            // Fallback to text
+            // Text Logo (Site Title)
             $siteTitle = $g['site_title'] ?? 'SaoirseTours';
-            $logoHtml = "<a class='navbar-brand fw-bold' href='home'>$siteTitle</a>";
+            // Use configured typography color or fallback
+            $brandColor = $d['typography']['logo_color'] ?? '#000';
+            $logoHtml = "<a class='navbar-brand fw-bold' href='home' style='color: $brandColor !important;'>$siteTitle</a>";
         }
 
         // MENU ITEMS
