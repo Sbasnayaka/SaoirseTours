@@ -120,7 +120,7 @@ class FooterRenderer
 
         // Fetch top 5 packages
         try {
-            $stmt = $this->pdo->query("SELECT id, title FROM packages WHERE status = 'published' LIMIT 5");
+            $stmt = $this->pdo->query("SELECT id, title FROM packages ORDER BY id DESC LIMIT 5");
             while ($pkg = $stmt->fetch(PDO::FETCH_ASSOC)) {
                 echo "<li><a href='package-detail.php?id={$pkg['id']}'>" . htmlspecialchars($pkg['title']) . "</a></li>";
             }

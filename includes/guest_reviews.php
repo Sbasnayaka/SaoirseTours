@@ -5,11 +5,10 @@ $reviews = $stmt->fetchAll();
 
 if ($reviews):
     ?>
-    <section class="py-5 bg-light">
+    <section class="py-5" style="background-color: #f9fbfd;">
         <div class="container">
             <div class="text-center mb-5">
-                <h2 class="section-title">Guest Reviews</h2>
-                <p class="text-muted">What our travelers say about us</p>
+                <h2 class="section-title fw-bold" style="color: var(--color-primary); letter-spacing: -1px;">Guest Reviews</h2>
             </div>
 
             <div class="owl-carousel owl-theme" id="reviews-slider">
@@ -152,16 +151,39 @@ if ($reviews):
     </script>
 
     <style>
+        /* Equal Height Hack for Owl Carousel */
+        .owl-stage { display: flex; }
+        .owl-item { display: flex; flex: 1 0 auto; }
+        .item { display: flex; flex-direction: column; width: 100%; padding: 10px; } /* Padding for shadow space */
+        
+        .review-card {
+            width: 100%;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            cursor: pointer; /* Reinforce clickable feel */
+            border: 1px solid rgba(0,0,0,0.08) !important;
+        }
+
+        .review-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
+            border-color: var(--color-primary) !important;
+        }
+
         .owl-dots {
-            margin-top: 20px !important;
+            margin-top: 30px !important;
         }
 
         .owl-theme .owl-dots .owl-dot span {
-            background: #ccc;
+            background: #e0e0e0;
+            width: 12px;
+            height: 12px;
+            margin: 5px;
+            transition: all 0.3s ease;
         }
 
         .owl-theme .owl-dots .owl-dot.active span {
             background: var(--color-primary);
+            width: 25px; /* Elongated active dot */
         }
     </style>
 <?php endif; ?>
